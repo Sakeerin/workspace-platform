@@ -10,5 +10,447 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Models will be added in Phase 2 when we implement the database schema
+enum WorkspacePlan {
+  free
+  personal
+  team
+  enterprise
+}
 
+enum WorkspaceMemberRole {
+  owner
+  admin
+  member
+  guest
+}
+
+enum PageType {
+  page
+  database
+}
+
+enum DatabaseType {
+  table
+  board
+  calendar
+  gallery
+  list
+  timeline
+}
+
+enum PageVisibility {
+  private
+  workspace
+  public
+}
+
+enum PermissionType {
+  view
+  comment
+  edit
+  full_access
+}
+
+model User {
+  id                    BigInt     @id @default(autoincrement()) @db.BigInt
+  uuid                  String     @unique @default(uuid()) @db.Uuid
+  email                 String     @unique @db.VarChar(255)
+  passwordHash          String     @map("password_hash") @db.VarChar(255)
+  name                  String     @db.VarChar(255)
+  avatarUrl             String?    @map("avatar_url") @db.Text
+  timezone              String     @default("UTC") @db.VarChar(50)
+  locale                String     @default("en") @db.VarChar(10)
+  preferences           Json       @default("{}")
+  twoFactorSecret       String?    @map("two_factor_secret") @db.VarChar(255)
+  twoFactorRecoveryCodes String[]  @map("two_factor_recovery_codes")
+  emailVerifiedAt       DateTime?  @map("email_verified_at") @db.Timestamp
+  lastLoginAt           DateTime?  @map("last_login_at") @db.Timestamp
+  lastLoginIp           String?    @map("last_login_ip") @db.Inet
+  isActive              Boolean    @default(true) @map("is_active")
+  createdAt             DateTime   @default(now()) @map("created_at") @db.Timestamp
+  updatedAt             DateTime   @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt             DateTime?  @map("deleted_at") @db.Timestamp
+
+  workspaceMembers      WorkspaceMember[]
+  pagesCreated          Page[]                   @relation("PageCreator")
+  pagesEdited           Page[]                   @relation("PageEditor")
+  blocksCreated         Block[]                  @relation("BlockCreator")
+  blocksEdited          Block[]                  @relation("BlockEditor")
+  comments              Comment[]
+  files                 File[]
+  favorites             Favorite[]
+  activityLogs          ActivityLog[]
+  notifications         Notification[]
+  notificationsTriggered Notification[]          @relation("NotificationTriggerer")
+
+  @@index([email], map: "idx_users_email")
+  @@index([uuid], map: "idx_users_uuid")
+  @@index([isActive], map: "idx_users_active")
+  @@map("users")
+}
+
+model Workspace {
+  id            BigInt    @id @default(autoincrement()) @db.BigInt
+  uuid          String    @unique @default(uuid()) @db.Uuid
+  name          String    @db.VarChar(255)
+  slug          String    @unique @db.VarChar(255)
+  domain        String?   @db.VarChar(255)
+  icon          String?   @db.VarChar(50)
+  coverImage    String?   @map("cover_image") @db.Text
+  settings      Json      @default("{}")
+  plan          WorkspacePlan @default(free) @db.VarChar(50)
+  planExpiresAt DateTime? @map("plan_expires_at") @db.Timestamp
+  maxMembers    Int       @default(10) @map("max_members")
+  maxStorageGb  Int       @default(5) @map("max_storage_gb")
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamp
+
+  members       WorkspaceMember[]
+  pages         Page[]
+  databases     Database[]
+  files         File[]
+  activityLogs  ActivityLog[]
+  notifications Notification[]
+
+  @@index([slug], map: "idx_workspaces_slug")
+  @@index([uuid], map: "idx_workspaces_uuid")
+  @@index([isActive], map: "idx_workspaces_active")
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id                    BigInt              @id @default(autoincrement()) @db.BigInt
+  workspaceId           BigInt              @map("workspace_id") @db.BigInt
+  userId                BigInt              @map("user_id") @db.BigInt
+  role                  WorkspaceMemberRole
+  permissions           Json                @default("{}")
+  joinedAt              DateTime            @default(now()) @map("joined_at") @db.Timestamp
+  invitedBy             BigInt?             @map("invited_by") @db.BigInt
+  invitationAcceptedAt  DateTime?           @map("invitation_accepted_at") @db.Timestamp
+  lastAccessedAt        DateTime?           @map("last_accessed_at") @db.Timestamp
+  isActive              Boolean             @default(true) @map("is_active")
+  createdAt             DateTime            @default(now()) @map("created_at") @db.Timestamp
+  updatedAt             DateTime            @updatedAt @map("updated_at") @db.Timestamp
+
+  workspace             Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId, isActive], map: "idx_workspace_members_workspace")
+  @@index([userId, isActive], map: "idx_workspace_members_user")
+  @@index([workspaceId, role], map: "idx_workspace_members_role")
+  @@map("workspace_members")
+}
+
+model Page {
+  id               BigInt        @id @default(autoincrement()) @db.BigInt
+  uuid             String        @unique @default(uuid()) @db.Uuid
+  workspaceId      BigInt        @map("workspace_id") @db.BigInt
+  parentId         BigInt?       @map("parent_id") @db.BigInt
+  createdById      BigInt        @map("created_by") @db.BigInt
+  lastEditedById   BigInt        @map("last_edited_by") @db.BigInt
+  title            String        @default("Untitled") @db.VarChar(500)
+  icon             String?       @db.VarChar(50)
+  coverImage       String?       @map("cover_image") @db.Text
+  coverPosition    String        @default("center") @map("cover_position") @db.VarChar(20)
+  content          Json          @default("{}")
+  contentText      String?       @map("content_text") @db.Text
+  type             PageType      @default(page)
+  databaseType     DatabaseType? @map("database_type")
+  isTemplate       Boolean       @default(false) @map("is_template")
+  isFavorite       Boolean       @default(false) @map("is_favorite")
+  isArchived       Boolean       @default(false) @map("is_archived")
+  isLocked         Boolean       @default(false) @map("is_locked")
+  visibility       PageVisibility @default(workspace)
+  allowComments    Boolean       @default(true) @map("allow_comments")
+  allowDuplicate   Boolean       @default(true) @map("allow_duplicate")
+  slug             String?       @db.VarChar(500)
+  metaDescription  String?       @map("meta_description") @db.Text
+  position         Int           @default(0)
+  publishedAt      DateTime?     @map("published_at") @db.Timestamp
+  archivedAt       DateTime?     @map("archived_at") @db.Timestamp
+  createdAt        DateTime      @default(now()) @map("created_at") @db.Timestamp
+  updatedAt        DateTime      @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt        DateTime?     @map("deleted_at") @db.Timestamp
+
+  workspace        Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  parent           Page?         @relation("PageHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children         Page[]        @relation("PageHierarchy")
+  createdBy        User          @relation("PageCreator", fields: [createdById], references: [id])
+  lastEditedBy     User          @relation("PageEditor", fields: [lastEditedById], references: [id])
+  blocks           Block[]
+  database         Database?
+  comments         Comment[]
+  pageVersions     PageVersion[]
+  pagePermissions  PagePermission[]
+  favorites        Favorite[]
+  files            File[]
+  activityLogs     ActivityLog[]
+  notifications    Notification[]
+  databaseRows     DatabaseRow[]
+
+  @@index([workspaceId, isArchived, deletedAt], map: "idx_pages_workspace")
+  @@index([parentId, position], map: "idx_pages_parent")
+  @@index([uuid], map: "idx_pages_uuid")
+  @@index([type, workspaceId], map: "idx_pages_type")
+  @@index([visibility, workspaceId], map: "idx_pages_visibility")
+  @@index([createdById], map: "idx_pages_created_by")
+  @@index([workspaceId, updatedAt(sort: Desc)], map: "idx_pages_updated_at")
+  @@map("pages")
+}
+
+model Block {
+  id            BigInt   @id @default(autoincrement()) @db.BigInt
+  uuid          String   @unique @default(uuid()) @db.Uuid
+  pageId        BigInt   @map("page_id") @db.BigInt
+  parentBlockId BigInt?  @map("parent_block_id") @db.BigInt
+  createdById   BigInt   @map("created_by") @db.BigInt
+  lastEditedById BigInt  @map("last_edited_by") @db.BigInt
+  type          String   @db.VarChar(100)
+  content       Json     @default("{}")
+  contentText   String?  @map("content_text") @db.Text
+  position      Int      @default(0)
+  depth         Int      @default(0)
+  properties    Json     @default("{}")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamp
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamp
+
+  page          Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  parentBlock   Block?   @relation("BlockHierarchy", fields: [parentBlockId], references: [id], onDelete: Cascade)
+  childBlocks   Block[]  @relation("BlockHierarchy")
+  createdBy     User     @relation("BlockCreator", fields: [createdById], references: [id])
+  lastEditedBy  User     @relation("BlockEditor", fields: [lastEditedById], references: [id])
+  comments      Comment[]
+  files         File[]
+
+  @@index([pageId, parentBlockId, position], map: "idx_blocks_page")
+  @@index([parentBlockId, position], map: "idx_blocks_parent")
+  @@index([uuid], map: "idx_blocks_uuid")
+  @@index([type, pageId], map: "idx_blocks_type")
+  @@index([pageId, updatedAt(sort: Desc)], map: "idx_blocks_updated_at")
+  @@map("blocks")
+}
+
+model Database {
+  id            BigInt      @id @default(autoincrement()) @db.BigInt
+  uuid          String      @unique @default(uuid()) @db.Uuid
+  pageId        BigInt      @unique @map("page_id") @db.BigInt
+  workspaceId   BigInt      @map("workspace_id") @db.BigInt
+  title         String?     @db.VarChar(500)
+  description   String?     @db.Text
+  properties    Json        @default("{}")
+  views         Json        @default("[]")
+  defaultViewId String?     @map("default_view_id") @db.VarChar(100)
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp
+  updatedAt     DateTime    @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt     DateTime?   @map("deleted_at") @db.Timestamp
+
+  page          Page        @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  workspace     Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  rows          DatabaseRow[]
+
+  @@index([pageId], map: "idx_databases_page")
+  @@index([workspaceId], map: "idx_databases_workspace")
+  @@index([uuid], map: "idx_databases_uuid")
+  @@map("databases")
+}
+
+model DatabaseRow {
+  id            BigInt   @id @default(autoincrement()) @db.BigInt
+  uuid          String   @unique @default(uuid()) @db.Uuid
+  databaseId    BigInt   @map("database_id") @db.BigInt
+  pageId        BigInt?  @map("page_id") @db.BigInt
+  properties    Json     @default("{}")
+  propertiesText String? @map("properties_text") @db.Text
+  position      Int      @default(0)
+  createdById   BigInt   @map("created_by") @db.BigInt
+  lastEditedById BigInt  @map("last_edited_by") @db.BigInt
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamp
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamp
+
+  database      Database @relation(fields: [databaseId], references: [id], onDelete: Cascade)
+  page          Page?    @relation(fields: [pageId], references: [id], onDelete: SetNull)
+
+  @@index([databaseId, position], map: "idx_database_rows_database")
+  @@index([pageId], map: "idx_database_rows_page")
+  @@index([uuid], map: "idx_database_rows_uuid")
+  @@index([databaseId, updatedAt(sort: Desc)], map: "idx_database_rows_updated_at")
+  @@map("database_rows")
+}
+
+model Comment {
+  id              BigInt   @id @default(autoincrement()) @db.BigInt
+  uuid            String   @unique @default(uuid()) @db.Uuid
+  pageId          BigInt   @map("page_id") @db.BigInt
+  blockId         BigInt?  @map("block_id") @db.BigInt
+  parentCommentId BigInt?  @map("parent_comment_id") @db.BigInt
+  userId          BigInt   @map("user_id") @db.BigInt
+  content         String   @db.Text
+  mentions        Json     @default("[]")
+  isResolved      Boolean  @default(false) @map("is_resolved")
+  resolvedById    BigInt?  @map("resolved_by") @db.BigInt
+  resolvedAt      DateTime? @map("resolved_at") @db.Timestamp
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamp
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamp
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamp
+
+  page            Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  block           Block?   @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  parentComment   Comment? @relation("CommentThread", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  childComments   Comment[] @relation("CommentThread")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([pageId, createdAt(sort: Desc)], map: "idx_comments_page")
+  @@index([blockId, createdAt(sort: Desc)], map: "idx_comments_block")
+  @@index([parentCommentId, createdAt], map: "idx_comments_parent")
+  @@index([userId], map: "idx_comments_user")
+  @@index([uuid], map: "idx_comments_uuid")
+  @@index([pageId, isResolved], map: "idx_comments_resolved")
+  @@map("comments")
+}
+
+model PageVersion {
+  id            BigInt   @id @default(autoincrement()) @db.BigInt
+  pageId        BigInt   @map("page_id") @db.BigInt
+  userId        BigInt   @map("user_id") @db.BigInt
+  versionNumber Int      @map("version_number")
+  title         String?  @db.VarChar(500)
+  content       String   @db.Text
+  changesSummary String? @map("changes_summary") @db.Text
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamp
+
+  page          Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, versionNumber])
+  @@index([pageId, versionNumber(sort: Desc)], map: "idx_page_versions_page")
+  @@index([userId], map: "idx_page_versions_user")
+  @@index([pageId, createdAt(sort: Desc)], map: "idx_page_versions_created")
+  @@map("page_versions")
+}
+
+model PagePermission {
+  id            BigInt        @id @default(autoincrement()) @db.BigInt
+  pageId        BigInt        @map("page_id") @db.BigInt
+  userId        BigInt?       @map("user_id") @db.BigInt
+  teamId        BigInt?       @map("team_id") @db.BigInt
+  permissionType PermissionType @map("permission_type") @db.VarChar(50)
+  grantedById   BigInt        @map("granted_by") @db.BigInt
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamp
+  expiresAt     DateTime?     @map("expires_at") @db.Timestamp
+
+  page          Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, userId])
+  @@index([pageId], map: "idx_page_permissions_page")
+  @@index([userId], map: "idx_page_permissions_user")
+  @@index([pageId, permissionType], map: "idx_page_permissions_type")
+  @@map("page_permissions")
+}
+
+model File {
+  id              BigInt   @id @default(autoincrement()) @db.BigInt
+  uuid            String   @unique @default(uuid()) @db.Uuid
+  workspaceId     BigInt   @map("workspace_id") @db.BigInt
+  uploadedById    BigInt   @map("uploaded_by") @db.BigInt
+  filename        String   @db.VarChar(500)
+  originalFilename String  @map("original_filename") @db.VarChar(500)
+  mimeType        String   @map("mime_type") @db.VarChar(255)
+  sizeBytes       BigInt   @map("size_bytes") @db.BigInt
+  storagePath     String   @map("storage_path") @db.Text
+  storageDisk     String   @default("s3") @map("storage_disk") @db.VarChar(50)
+  width           Int?     @db.Int
+  height          Int?     @db.Int
+  pageId          BigInt?  @map("page_id") @db.BigInt
+  blockId         BigInt?  @map("block_id") @db.BigInt
+  isPublic        Boolean  @default(false) @map("is_public")
+  publicUrl       String?  @map("public_url") @db.Text
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamp
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamp
+
+  workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  uploadedBy      User      @relation(fields: [uploadedById], references: [id])
+  page            Page?     @relation(fields: [pageId], references: [id], onDelete: SetNull)
+  block           Block?    @relation(fields: [blockId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, deletedAt], map: "idx_files_workspace")
+  @@index([uploadedById], map: "idx_files_uploaded_by")
+  @@index([pageId], map: "idx_files_page")
+  @@index([blockId], map: "idx_files_block")
+  @@index([uuid], map: "idx_files_uuid")
+  @@index([mimeType], map: "idx_files_mime_type")
+  @@index([isPublic, publicUrl], map: "idx_files_public")
+  @@map("files")
+}
+
+model Favorite {
+  id        BigInt   @id @default(autoincrement()) @db.BigInt
+  userId    BigInt   @map("user_id") @db.BigInt
+  pageId    BigInt   @map("page_id") @db.BigInt
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, pageId])
+  @@index([userId, position], map: "idx_favorites_user")
+  @@index([pageId], map: "idx_favorites_page")
+  @@map("favorites")
+}
+
+model ActivityLog {
+  id          BigInt   @id @default(autoincrement()) @db.BigInt
+  workspaceId BigInt   @map("workspace_id") @db.BigInt
+  userId      BigInt?  @map("user_id") @db.BigInt
+  pageId      BigInt?  @map("page_id") @db.BigInt
+  action      String   @db.VarChar(100)
+  entityType  String   @map("entity_type") @db.VarChar(100)
+  entityId    BigInt?  @map("entity_id") @db.BigInt
+  details     Json     @default("{}")
+  ipAddress   String?  @map("ip_address") @db.Inet
+  userAgent   String?  @map("user_agent") @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamp
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  page        Page?     @relation(fields: [pageId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, createdAt(sort: Desc)], map: "idx_activity_logs_workspace")
+  @@index([userId, createdAt(sort: Desc)], map: "idx_activity_logs_user")
+  @@index([pageId, createdAt(sort: Desc)], map: "idx_activity_logs_page")
+  @@index([action, createdAt(sort: Desc)], map: "idx_activity_logs_action")
+  @@index([entityType, entityId], map: "idx_activity_logs_entity")
+  @@map("activity_logs")
+}
+
+model Notification {
+  id            BigInt   @id @default(autoincrement()) @db.BigInt
+  uuid          String   @unique @default(uuid()) @db.Uuid
+  userId        BigInt   @map("user_id") @db.BigInt
+  workspaceId   BigInt   @map("workspace_id") @db.BigInt
+  type          String   @db.VarChar(100)
+  title         String   @db.VarChar(500)
+  message       String?  @db.Text
+  data          Json     @default("{}")
+  pageId        BigInt?  @map("page_id") @db.BigInt
+  triggeredById BigInt?  @map("triggered_by") @db.BigInt
+  isRead        Boolean  @default(false) @map("is_read")
+  readAt        DateTime? @map("read_at") @db.Timestamp
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamp
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  page          Page?    @relation(fields: [pageId], references: [id], onDelete: SetNull)
+  triggeredBy   User?    @relation("NotificationTriggerer", fields: [triggeredById], references: [id], onDelete: SetNull)
+
+  @@index([userId, isRead, createdAt(sort: Desc)], map: "idx_notifications_user")
+  @@index([workspaceId], map: "idx_notifications_workspace")
+  @@index([pageId], map: "idx_notifications_page")
+  @@index([uuid], map: "idx_notifications_uuid")
+  @@index([userId, isRead], map: "idx_notifications_unread")
+  @@map("notifications")
+}

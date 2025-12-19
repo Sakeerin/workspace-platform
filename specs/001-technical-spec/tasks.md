@@ -24,24 +24,24 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create backend project structure in backend/ directory
-- [ ] T002 Create frontend project structure in frontend/ directory
-- [ ] T003 [P] Initialize backend NestJS project with TypeScript 5.0+ in backend/
-- [ ] T004 [P] Initialize frontend React 18+ project with Vite 5.0+ in frontend/
-- [ ] T005 [P] Setup Prisma ORM in backend/prisma/ with PostgreSQL 16+ configuration
-- [ ] T006 [P] Configure ESLint and Prettier in backend/
-- [ ] T007 [P] Configure ESLint and Prettier in frontend/
-- [ ] T008 [P] Setup TypeScript configuration in backend/tsconfig.json
-- [ ] T009 [P] Setup TypeScript configuration in frontend/tsconfig.json
-- [ ] T010 [P] Setup Tailwind CSS 3.4+ in frontend/
-- [ ] T011 [P] Setup shadcn/ui component library in frontend/
-- [ ] T012 [P] Configure environment variables (.env.example) in backend/
-- [ ] T013 [P] Configure environment variables (.env.example) in frontend/
-- [ ] T014 [P] Setup Jest/Vitest testing framework in backend/
-- [ ] T015 [P] Setup Vitest testing framework in frontend/
-- [ ] T016 [P] Setup Playwright for E2E tests in frontend/tests/e2e/
-- [ ] T017 [P] Initialize Git repository and setup .gitignore files
-- [ ] T018 [P] Create Docker Compose file for local development (PostgreSQL, Redis, MinIO) in docker-compose.yml
+- [x] T001 Create backend project structure in backend/ directory
+- [x] T002 Create frontend project structure in frontend/ directory
+- [x] T003 [P] Initialize backend NestJS project with TypeScript 5.0+ in backend/
+- [x] T004 [P] Initialize frontend React 18+ project with Vite 5.0+ in frontend/
+- [x] T005 [P] Setup Prisma ORM in backend/prisma/ with PostgreSQL 16+ configuration
+- [x] T006 [P] Configure ESLint and Prettier in backend/
+- [x] T007 [P] Configure ESLint and Prettier in frontend/
+- [x] T008 [P] Setup TypeScript configuration in backend/tsconfig.json
+- [x] T009 [P] Setup TypeScript configuration in frontend/tsconfig.json
+- [x] T010 [P] Setup Tailwind CSS 3.4+ in frontend/
+- [ ] T011 [P] Setup shadcn/ui component library in frontend/ (requires: `npx shadcn-ui@latest init`)
+- [x] T012 [P] Configure environment variables (.env.example) in backend/ (template created, manual copy needed)
+- [x] T013 [P] Configure environment variables (.env.example) in frontend/ (template created, manual copy needed)
+- [x] T014 [P] Setup Jest/Vitest testing framework in backend/
+- [x] T015 [P] Setup Vitest testing framework in frontend/
+- [x] T016 [P] Setup Playwright for E2E tests in frontend/tests/e2e/
+- [x] T017 [P] Initialize Git repository and setup .gitignore files
+- [x] T018 [P] Create Docker Compose file for local development (PostgreSQL, Redis, MinIO) in docker-compose.yml
 
 ---
 

@@ -31,7 +31,39 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+### Core Principles Compliance
+
+- [ ] **Flexibility First**: Does this feature support block-based architecture and customization?
+- [ ] **Collaboration-Centric**: Does this feature support real-time collaboration if applicable?
+- [ ] **Rich Content Support**: Does this feature support the required content types?
+- [ ] **Performance & Reliability**: Does this feature meet performance targets (< 200ms API, < 1.5s page load)?
+- [ ] **Security & Privacy**: Does this feature implement proper authentication, authorization, and data protection?
+- [ ] **Test-Driven Development**: Are tests written before implementation? (TDD mandatory)
+- [ ] **API-First Design**: Is the API design clear and documented?
+
+### Technology Stack Alignment
+
+- [ ] Backend: Node.js 20+ / TypeScript 5.0+ / NestJS (or approved alternative)
+- [ ] Frontend: React 18+ / TypeScript 5.0+ / Vite 5.0+ (or approved alternative)
+- [ ] Database: PostgreSQL 16+ / Prisma (or approved alternative)
+- [ ] Real-time: Socket.io / WebSocket
+- [ ] Testing: Jest/Vitest for unit/integration, Playwright for E2E
+
+### Performance Requirements
+
+- [ ] API response time < 200ms (p95)
+- [ ] Page load time < 1.5s (first load)
+- [ ] Real-time sync latency < 100ms
+- [ ] Scalability considerations addressed
+
+### Security Requirements
+
+- [ ] Authentication/authorization implemented
+- [ ] Input validation and sanitization
+- [ ] SQL injection prevention
+- [ ] XSS protection
+- [ ] CSRF protection
+- [ ] Rate limiting considered
 
 ## Project Structure
 

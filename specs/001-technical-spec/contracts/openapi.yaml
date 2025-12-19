@@ -1,0 +1,859 @@
+openapi: 3.0.3
+info:
+  title: All-in-One Workspace Platform API
+  description: RESTful API for All-in-One Workspace Platform (Notion-like)
+  version: 1.0.0
+  contact:
+    name: API Support
+    email: api@workspace-platform.com
+
+servers:
+  - url: https://api.workspace-platform.com/api/v1
+    description: Production server
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Workspaces
+    description: Workspace management
+  - name: Pages
+    description: Page and content management
+  - name: Blocks
+    description: Block-level operations
+  - name: Databases
+    description: Database and row operations
+  - name: Comments
+    description: Comments and discussions
+  - name: Files
+    description: File upload and management
+  - name: Search
+    description: Search functionality
+  - name: Notifications
+    description: User notifications
+  - name: Activity
+    description: Activity logs
+
+paths:
+  # Authentication
+  /auth/register:
+    post:
+      tags: [Authentication]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                name:
+                  type: string
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /auth/login:
+    post:
+      tags: [Authentication]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/me:
+    get:
+      tags: [Authentication]
+      summary: Get current user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # Workspaces
+  /workspaces:
+    get:
+      tags: [Workspaces]
+      summary: List user workspaces
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: List of workspaces
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Workspace'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      tags: [Workspaces]
+      summary: Create workspace
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                slug:
+                  type: string
+                icon:
+                  type: string
+      responses:
+        '201':
+          description: Workspace created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+
+  /workspaces/{workspaceUuid}:
+    get:
+      tags: [Workspaces]
+      summary: Get workspace
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceUuid'
+      responses:
+        '200':
+          description: Workspace details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags: [Workspaces]
+      summary: Update workspace
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceUuid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                icon:
+                  type: string
+                settings:
+                  type: object
+      responses:
+        '200':
+          description: Workspace updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+
+    delete:
+      tags: [Workspaces]
+      summary: Delete workspace
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceUuid'
+      responses:
+        '204':
+          description: Workspace deleted
+
+  # Pages
+  /workspaces/{workspaceUuid}/pages:
+    get:
+      tags: [Pages]
+      summary: List pages in workspace
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceUuid'
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: parent_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [page, database]
+      responses:
+        '200':
+          description: List of pages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Page'
+
+    post:
+      tags: [Pages]
+      summary: Create page
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [title]
+              properties:
+                title:
+                  type: string
+                parent_id:
+                  type: string
+                  format: uuid
+                type:
+                  type: string
+                  enum: [page, database]
+                  default: page
+                icon:
+                  type: string
+                visibility:
+                  type: string
+                  enum: [private, workspace, public]
+                  default: workspace
+      responses:
+        '201':
+          description: Page created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+
+  /workspaces/{workspaceUuid}/pages/{pageUuid}:
+    get:
+      tags: [Pages]
+      summary: Get page
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceUuid'
+        - $ref: '#/components/parameters/PageUuid'
+      responses:
+        '200':
+          description: Page details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+
+    patch:
+      tags: [Pages]
+      summary: Update page
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceUuid'
+        - $ref: '#/components/parameters/PageUuid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                icon:
+                  type: string
+                cover_image:
+                  type: string
+                visibility:
+                  type: string
+                  enum: [private, workspace, public]
+      responses:
+        '200':
+          description: Page updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Page'
+
+    delete:
+      tags: [Pages]
+      summary: Delete page
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceUuid'
+        - $ref: '#/components/parameters/PageUuid'
+      responses:
+        '204':
+          description: Page deleted
+
+  # Blocks
+  /pages/{pageUuid}/blocks:
+    get:
+      tags: [Blocks]
+      summary: List blocks in page
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageUuid'
+      responses:
+        '200':
+          description: List of blocks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Block'
+
+    post:
+      tags: [Blocks]
+      summary: Create block
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type, content]
+              properties:
+                type:
+                  type: string
+                content:
+                  type: object
+                parent_block_id:
+                  type: string
+                  format: uuid
+                position:
+                  type: integer
+      responses:
+        '201':
+          description: Block created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Block'
+
+  /pages/{pageUuid}/blocks/{blockUuid}:
+    patch:
+      tags: [Blocks]
+      summary: Update block
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageUuid'
+        - name: blockUuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: object
+                properties:
+                  type: object
+      responses:
+        '200':
+          description: Block updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Block'
+
+    delete:
+      tags: [Blocks]
+      summary: Delete block
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageUuid'
+        - name: blockUuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Block deleted
+
+  # Comments
+  /pages/{pageUuid}/comments:
+    get:
+      tags: [Comments]
+      summary: List comments on page
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageUuid'
+      responses:
+        '200':
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Comment'
+
+    post:
+      tags: [Comments]
+      summary: Create comment
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [content]
+              properties:
+                content:
+                  type: string
+                block_id:
+                  type: string
+                  format: uuid
+                parent_comment_id:
+                  type: string
+                  format: uuid
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+
+  # Search
+  /workspaces/{workspaceUuid}/search:
+    get:
+      tags: [Search]
+      summary: Search workspace
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceUuid'
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [page, block, database]
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SearchResult'
+
+  # Notifications
+  /notifications:
+    get:
+      tags: [Notifications]
+      summary: List user notifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: is_read
+          in: query
+          schema:
+            type: boolean
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    WorkspaceUuid:
+      name: workspaceUuid
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    PageUuid:
+      name: pageUuid
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+
+    LimitParam:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+        maximum: 100
+
+  schemas:
+    User:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        avatar_url:
+          type: string
+          nullable: true
+        timezone:
+          type: string
+        locale:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    Workspace:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        icon:
+          type: string
+          nullable: true
+        plan:
+          type: string
+          enum: [free, personal, team, enterprise]
+        created_at:
+          type: string
+          format: date-time
+
+    Page:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        title:
+          type: string
+        icon:
+          type: string
+          nullable: true
+        type:
+          type: string
+          enum: [page, database]
+        visibility:
+          type: string
+          enum: [private, workspace, public]
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Block:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        type:
+          type: string
+        content:
+          type: object
+        properties:
+          type: object
+        position:
+          type: integer
+        parent_block_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Comment:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        content:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+        block_id:
+          type: string
+          format: uuid
+          nullable: true
+        parent_comment_id:
+          type: string
+          format: uuid
+          nullable: true
+        is_resolved:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    Notification:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        type:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        is_read:
+          type: boolean
+        page_id:
+          type: string
+          format: uuid
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    SearchResult:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        type:
+          type: string
+        title:
+          type: string
+        snippet:
+          type: string
+        page_id:
+          type: string
+          format: uuid
+
+    AuthResponse:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        total_pages:
+          type: integer
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: array
+              items:
+                type: object
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+        requestId:
+          type: string
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: VALIDATION_ERROR
+              message: Validation failed
+              details:
+                - field: email
+                  message: Invalid email format
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+

@@ -89,15 +89,15 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T042 [P] [US1] Create unit test for User model in backend/tests/unit/models/user.test.ts
-- [ ] T043 [P] [US1] Create unit test for Workspace model in backend/tests/unit/models/workspace.test.ts
-- [ ] T044 [P] [US1] Create integration test for auth registration endpoint in backend/tests/integration/auth/register.test.ts
-- [ ] T045 [P] [US1] Create integration test for auth login endpoint in backend/tests/integration/auth/login.test.ts
-- [ ] T046 [P] [US1] Create integration test for workspace creation in backend/tests/integration/workspace/create.test.ts
-- [ ] T047 [P] [US1] Create contract test for POST /api/v1/auth/register in backend/tests/contract/auth/register.contract.test.ts
-- [ ] T048 [P] [US1] Create contract test for POST /api/v1/auth/login in backend/tests/contract/auth/login.contract.test.ts
-- [ ] T049 [P] [US1] Create E2E test for user registration flow in frontend/tests/e2e/auth/register.spec.ts
-- [ ] T050 [P] [US1] Create E2E test for user login flow in frontend/tests/e2e/auth/login.spec.ts
+- [x] T042 [P] [US1] Create unit test for User model in backend/tests/unit/models/user.test.ts
+- [x] T043 [P] [US1] Create unit test for Workspace model in backend/tests/unit/models/workspace.test.ts
+- [x] T044 [P] [US1] Create integration test for auth registration endpoint in backend/tests/integration/auth/register.test.ts
+- [x] T045 [P] [US1] Create integration test for auth login endpoint in backend/tests/integration/auth/login.test.ts
+- [x] T046 [P] [US1] Create integration test for workspace creation in backend/tests/integration/workspace/create.test.ts
+- [x] T047 [P] [US1] Create contract test for POST /api/v1/auth/register in backend/tests/contract/auth/register.contract.test.ts
+- [x] T048 [P] [US1] Create contract test for POST /api/v1/auth/login in backend/tests/contract/auth/login.contract.test.ts
+- [x] T049 [P] [US1] Create E2E test for user registration flow in frontend/tests/e2e/auth/register.spec.ts
+- [x] T050 [P] [US1] Create E2E test for user login flow in frontend/tests/e2e/auth/login.spec.ts
 
 ### Implementation for User Story 1
 

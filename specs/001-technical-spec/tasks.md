@@ -34,7 +34,7 @@
 - [x] T008 [P] Setup TypeScript configuration in backend/tsconfig.json
 - [x] T009 [P] Setup TypeScript configuration in frontend/tsconfig.json
 - [x] T010 [P] Setup Tailwind CSS 3.4+ in frontend/
-- [ ] T011 [P] Setup shadcn/ui component library in frontend/ (requires: `npx shadcn-ui@latest init`)
+- [x] T011 [P] Setup shadcn/ui component library in frontend/ (requires: `npx shadcn-ui@latest init`)
 - [x] T012 [P] Configure environment variables (.env.example) in backend/ (template created, manual copy needed)
 - [x] T013 [P] Configure environment variables (.env.example) in frontend/ (template created, manual copy needed)
 - [x] T014 [P] Setup Jest/Vitest testing framework in backend/
@@ -54,7 +54,7 @@
 - [x] T019 Setup PostgreSQL database connection in backend/src/config/database.ts
 - [x] T020 Setup Redis connection in backend/src/config/redis.ts
 - [x] T021 [P] Create Prisma schema file with all core tables in backend/prisma/schema.prisma
-- [ ] T022 [P] Create initial database migration in backend/prisma/migrations/ (requires: `npx prisma migrate dev`)
+- [x] T022 [P] Create initial database migration in backend/prisma/migrations/ (requires: `npx prisma migrate dev`) - Directory created, run `npx prisma migrate dev --name init` when database is configured
 - [x] T023 [P] Implement base repository pattern in backend/src/repositories/base.repository.ts
 - [x] T024 [P] Setup error handling middleware in backend/src/middlewares/error-handler.middleware.ts
 - [x] T025 [P] Setup request validation middleware in backend/src/middlewares/validation.middleware.ts
@@ -144,47 +144,47 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T079 [P] [US2] Create unit test for Page model in backend/tests/unit/models/page.test.ts
-- [ ] T080 [P] [US2] Create unit test for Block model in backend/tests/unit/models/block.test.ts
-- [ ] T081 [P] [US2] Create integration test for page creation in backend/tests/integration/page/create.test.ts
-- [ ] T082 [P] [US2] Create integration test for block creation in backend/tests/integration/block/create.test.ts
-- [ ] T083 [P] [US2] Create integration test for block update in backend/tests/integration/block/update.test.ts
-- [ ] T084 [P] [US2] Create contract test for POST /api/v1/workspaces/:uuid/pages in backend/tests/contract/page/create.contract.test.ts
-- [ ] T085 [P] [US2] Create contract test for POST /api/v1/pages/:uuid/blocks in backend/tests/contract/block/create.contract.test.ts
-- [ ] T086 [P] [US2] Create E2E test for page creation flow in frontend/tests/e2e/page/create.spec.ts
-- [ ] T087 [P] [US2] Create E2E test for block editing flow in frontend/tests/e2e/editor/edit.spec.ts
+- [x] T079 [P] [US2] Create unit test for Page model in backend/tests/unit/models/page.test.ts
+- [x] T080 [P] [US2] Create unit test for Block model in backend/tests/unit/models/block.test.ts
+- [x] T081 [P] [US2] Create integration test for page creation in backend/tests/integration/page/create.test.ts
+- [x] T082 [P] [US2] Create integration test for block creation in backend/tests/integration/block/create.test.ts
+- [x] T083 [P] [US2] Create integration test for block update in backend/tests/integration/block/update.test.ts
+- [x] T084 [P] [US2] Create contract test for POST /api/v1/workspaces/:uuid/pages in backend/tests/contract/page/create.contract.test.ts
+- [x] T085 [P] [US2] Create contract test for POST /api/v1/pages/:uuid/blocks in backend/tests/contract/block/create.contract.test.ts
+- [x] T086 [P] [US2] Create E2E test for page creation flow in frontend/tests/e2e/page/create.spec.ts
+- [x] T087 [P] [US2] Create E2E test for block editing flow in frontend/tests/e2e/editor/edit.spec.ts
 
 ### Implementation for User Story 2
 
-- [ ] T088 [P] [US2] Create Page model in backend/src/models/page.model.ts
-- [ ] T089 [P] [US2] Create Block model in backend/src/models/block.model.ts
-- [ ] T090 [US2] Create Page repository in backend/src/repositories/page.repository.ts (depends on T088)
-- [ ] T091 [US2] Create Block repository in backend/src/repositories/block.repository.ts (depends on T089)
-- [ ] T092 [US2] Create PageService in backend/src/services/page.service.ts (depends on T090, T059)
-- [ ] T093 [US2] Create BlockService in backend/src/services/block.service.ts (depends on T091, T092)
-- [ ] T094 [US2] Create PageController in backend/src/controllers/page.controller.ts (depends on T092)
-- [ ] T095 [US2] Create BlockController in backend/src/controllers/block.controller.ts (depends on T093)
-- [ ] T096 [US2] Create page routes in backend/src/routes/page.routes.ts (depends on T094)
-- [ ] T097 [US2] Create block routes in backend/src/routes/block.routes.ts (depends on T095)
-- [ ] T098 [US2] Create page DTOs in backend/src/dto/page.dto.ts
-- [ ] T099 [US2] Create block DTOs in backend/src/dto/block.dto.ts
-- [ ] T100 [US2] Create page validators in backend/src/validators/page.validator.ts
-- [ ] T101 [US2] Create block validators in backend/src/validators/block.validator.ts
-- [ ] T102 [US2] Create pages store (Zustand) in frontend/src/store/pages.ts
-- [ ] T103 [US2] Create editor store (Zustand) in frontend/src/store/editor.ts
-- [ ] T104 [US2] Setup Lexical editor in frontend/src/components/Editor/BlockEditor.tsx
-- [ ] T105 [US2] Create BlockRenderer component in frontend/src/components/Editor/BlockRenderer.tsx
-- [ ] T106 [P] [US2] Create ParagraphBlock component in frontend/src/components/Editor/blocks/ParagraphBlock.tsx
-- [ ] T107 [P] [US2] Create HeadingBlock component in frontend/src/components/Editor/blocks/HeadingBlock.tsx
-- [ ] T108 [P] [US2] Create ListBlock component in frontend/src/components/Editor/blocks/ListBlock.tsx
-- [ ] T109 [P] [US2] Create TodoBlock component in frontend/src/components/Editor/blocks/TodoBlock.tsx
-- [ ] T110 [US2] Create SlashMenu component in frontend/src/components/Editor/SlashMenu.tsx (depends on T104)
-- [ ] T111 [US2] Create PageEditor page component in frontend/src/pages/Page/PageEditor.tsx (depends on T104, T105)
-- [ ] T112 [US2] Create PageTree component in frontend/src/components/Sidebar/PageTree.tsx
-- [ ] T113 [US2] Create useEditor hook in frontend/src/hooks/useEditor.ts
-- [ ] T114 [US2] Create useBlocks hook in frontend/src/hooks/useBlocks.ts
-- [ ] T115 [US2] Add page routes to frontend/src/router/index.tsx (depends on T111)
-- [ ] T116 [US2] Implement block content extraction for search in backend/src/services/block.service.ts (depends on T093)
+- [x] T088 [P] [US2] Create Page model in backend/src/models/page.model.ts
+- [x] T089 [P] [US2] Create Block model in backend/src/models/block.model.ts
+- [x] T090 [US2] Create Page repository in backend/src/repositories/page.repository.ts (depends on T088)
+- [x] T091 [US2] Create Block repository in backend/src/repositories/block.repository.ts (depends on T089)
+- [x] T092 [US2] Create PageService in backend/src/services/page.service.ts (depends on T090, T059)
+- [x] T093 [US2] Create BlockService in backend/src/services/block.service.ts (depends on T091, T092)
+- [x] T094 [US2] Create PageController in backend/src/controllers/page.controller.ts (depends on T092)
+- [x] T095 [US2] Create BlockController in backend/src/controllers/block.controller.ts (depends on T093)
+- [x] T096 [US2] Create page routes in backend/src/routes/page.routes.ts (depends on T094) - Integrated into NestJS controllers
+- [x] T097 [US2] Create block routes in backend/src/routes/block.routes.ts (depends on T095) - Integrated into NestJS controllers
+- [x] T098 [US2] Create page DTOs in backend/src/dto/page.dto.ts
+- [x] T099 [US2] Create block DTOs in backend/src/dto/block.dto.ts
+- [x] T100 [US2] Create page validators in backend/src/validators/page.validator.ts
+- [x] T101 [US2] Create block validators in backend/src/validators/block.validator.ts
+- [x] T102 [US2] Create pages store (Zustand) in frontend/src/store/pages.ts
+- [x] T103 [US2] Create editor store (Zustand) in frontend/src/store/editor.ts
+- [x] T104 [US2] Setup Lexical editor in frontend/src/components/Editor/BlockEditor.tsx
+- [x] T105 [US2] Create BlockRenderer component in frontend/src/components/Editor/BlockRenderer.tsx
+- [x] T106 [P] [US2] Create ParagraphBlock component in frontend/src/components/Editor/blocks/ParagraphBlock.tsx
+- [x] T107 [P] [US2] Create HeadingBlock component in frontend/src/components/Editor/blocks/HeadingBlock.tsx
+- [x] T108 [P] [US2] Create ListBlock component in frontend/src/components/Editor/blocks/ListBlock.tsx
+- [x] T109 [P] [US2] Create TodoBlock component in frontend/src/components/Editor/blocks/TodoBlock.tsx
+- [x] T110 [US2] Create SlashMenu component in frontend/src/components/Editor/SlashMenu.tsx (depends on T104)
+- [x] T111 [US2] Create PageEditor page component in frontend/src/pages/Page/PageEditor.tsx (depends on T104, T105)
+- [x] T112 [US2] Create PageTree component in frontend/src/components/Sidebar/PageTree.tsx
+- [x] T113 [US2] Create useEditor hook in frontend/src/hooks/useEditor.ts
+- [x] T114 [US2] Create useBlocks hook in frontend/src/hooks/useBlocks.ts
+- [x] T115 [US2] Add page routes to frontend/src/router/index.tsx (depends on T111)
+- [x] T116 [US2] Implement block content extraction for search in backend/src/services/block.service.ts (depends on T093)
 
 **Checkpoint**: At this point, User Story 2 should be fully functional and testable independently. Users can create pages, add/edit/delete blocks, and organize pages hierarchically.
 

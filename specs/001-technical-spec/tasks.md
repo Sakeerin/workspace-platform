@@ -200,29 +200,29 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T117 [P] [US3] Create integration test for WebSocket connection in backend/tests/integration/websocket/connection.test.ts
-- [ ] T118 [P] [US3] Create integration test for presence events in backend/tests/integration/websocket/presence.test.ts
-- [ ] T119 [P] [US3] Create integration test for block update events in backend/tests/integration/websocket/block-events.test.ts
-- [ ] T120 [P] [US3] Create E2E test for real-time collaboration in frontend/tests/e2e/collaboration/realtime.spec.ts
+- [x] T117 [P] [US3] Create integration test for WebSocket connection in backend/tests/integration/websocket/connection.test.ts
+- [x] T118 [P] [US3] Create integration test for presence events in backend/tests/integration/websocket/presence.test.ts
+- [x] T119 [P] [US3] Create integration test for block update events in backend/tests/integration/websocket/block-events.test.ts
+- [x] T120 [P] [US3] Create E2E test for real-time collaboration in frontend/tests/e2e/collaboration/realtime.spec.ts
 
 ### Implementation for User Story 3
 
-- [ ] T121 [US3] Setup Yjs CRDT library in backend/src/websocket/crdt/yjs-setup.ts
-- [ ] T122 [US3] Create WebSocketService in backend/src/services/websocket.service.ts (depends on T034)
-- [ ] T123 [US3] Create presence handler in backend/src/websocket/handlers/presence.handler.ts
-- [ ] T124 [US3] Create block event handler in backend/src/websocket/handlers/block.handler.ts (depends on T093)
-- [ ] T125 [US3] Create page event handler in backend/src/websocket/handlers/page.handler.ts (depends on T092)
-- [ ] T126 [US3] Create room manager for WebSocket rooms in backend/src/websocket/room.manager.ts
-- [ ] T127 [US3] Integrate CRDT with block updates in backend/src/services/block.service.ts (depends on T093, T121)
-- [ ] T128 [US3] Setup Yjs provider in frontend/src/services/yjs-provider.ts
-- [ ] T129 [US3] Create useWebSocket hook in frontend/src/hooks/useWebSocket.ts
-- [ ] T130 [US3] Create useCollaboration hook in frontend/src/hooks/useCollaboration.ts (depends on T128, T129)
-- [ ] T131 [US3] Create PresenceIndicator component in frontend/src/components/Editor/PresenceIndicator.tsx
-- [ ] T132 [US3] Create LiveCursor component in frontend/src/components/Editor/LiveCursor.tsx
-- [ ] T133 [US3] Integrate Yjs with Lexical editor in frontend/src/components/Editor/BlockEditor.tsx (depends on T104, T128)
-- [ ] T134 [US3] Create presence store (Zustand) in frontend/src/store/presence.ts
-- [ ] T135 [US3] Implement optimistic updates in frontend/src/hooks/useBlocks.ts (depends on T114)
-- [ ] T136 [US3] Add connection recovery logic in frontend/src/services/websocket.ts (depends on T036)
+- [x] T121 [US3] Setup Yjs CRDT library in backend/src/websocket/crdt/yjs-setup.ts
+- [x] T122 [US3] Create WebSocketService in backend/src/services/websocket.service.ts (depends on T034)
+- [x] T123 [US3] Create presence handler in backend/src/websocket/handlers/presence.handler.ts
+- [x] T124 [US3] Create block event handler in backend/src/websocket/handlers/block.handler.ts (depends on T093)
+- [x] T125 [US3] Create page event handler in backend/src/websocket/handlers/page.handler.ts (depends on T092)
+- [x] T126 [US3] Create room manager for WebSocket rooms in backend/src/websocket/room.manager.ts
+- [x] T127 [US3] Integrate CRDT with block updates in backend/src/services/block.service.ts (depends on T093, T121)
+- [x] T128 [US3] Setup Yjs provider in frontend/src/services/yjs-provider.ts
+- [x] T129 [US3] Create useWebSocket hook in frontend/src/hooks/useWebSocket.ts
+- [x] T130 [US3] Create useCollaboration hook in frontend/src/hooks/useCollaboration.ts (depends on T128, T129)
+- [x] T131 [US3] Create PresenceIndicator component in frontend/src/components/Editor/PresenceIndicator.tsx
+- [x] T132 [US3] Create LiveCursor component in frontend/src/components/Editor/LiveCursor.tsx
+- [x] T133 [US3] Integrate Yjs with Lexical editor in frontend/src/components/Editor/BlockEditor.tsx (depends on T104, T128)
+- [x] T134 [US3] Create presence store (Zustand) in frontend/src/store/presence.ts
+- [x] T135 [US3] Implement optimistic updates in frontend/src/hooks/useBlocks.ts (depends on T114)
+- [x] T136 [US3] Add connection recovery logic in frontend/src/services/websocket.ts (depends on T036)
 
 **Checkpoint**: At this point, User Story 3 should be fully functional. Multiple users can collaborate in real-time with live cursors and presence.
 

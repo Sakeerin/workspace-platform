@@ -2,13 +2,24 @@ import { BlockRepository } from '../repositories/block.repository';
 import { PageRepository } from '../repositories/page.repository';
 import { PermissionService } from './permission.service';
 import { CreateBlockDto, UpdateBlockDto } from '../dto/block.dto';
+import { WebSocketService } from './websocket.service';
+import { YjsSetup } from '../websocket/crdt/yjs-setup';
 
 export class BlockService {
+  private websocketService: WebSocketService | null = null;
+
   constructor(
     private blockRepo: BlockRepository,
     private pageRepo: PageRepository,
     private permissionService: PermissionService
   ) {}
+
+  /**
+   * Set WebSocket service for real-time updates
+   */
+  setWebSocketService(websocketService: WebSocketService) {
+    this.websocketService = websocketService;
+  }
 
   async createBlock(pageUuid: string, userId: bigint, dto: CreateBlockDto) {
     // Get page and verify access
@@ -50,6 +61,33 @@ export class BlockService {
       depth,
     });
 
+    // Update Yjs document
+    const blocksMap = YjsSetup.getBlocksMap(pageUuid);
+    blocksMap.set(block.uuid, {
+      uuid: block.uuid,
+      type: block.type,
+      content: block.content,
+      properties: block.properties,
+      position: block.position,
+      depth: block.depth,
+      created_by: userId.toString(),
+      last_edited_by: userId.toString(),
+      created_at: block.createdAt.toISOString(),
+      updated_at: block.updatedAt.toISOString(),
+    });
+
+    // Broadcast real-time update
+    if (this.websocketService) {
+      this.websocketService.broadcastBlockCreate(pageUuid, {
+        uuid: block.uuid,
+        type: block.type,
+        content: block.content,
+        properties: block.properties,
+        position: block.position,
+        depth: block.depth,
+      });
+    }
+
     return block;
   }
 
@@ -89,11 +127,40 @@ export class BlockService {
       contentText = this.extractContentText(dto.content);
     }
 
-    return this.blockRepo.updateByUuid(blockUuid, {
+    const updatedBlock = await this.blockRepo.updateByUuid(blockUuid, {
       ...dto,
       contentText,
       lastEditedById: userId,
     });
+
+    // Update Yjs document
+    const blocksMap = YjsSetup.getBlocksMap(pageUuid);
+    const currentBlock = blocksMap.get(blockUuid) || {};
+    blocksMap.set(blockUuid, {
+      ...currentBlock,
+      uuid: updatedBlock.uuid,
+      type: updatedBlock.type,
+      content: updatedBlock.content,
+      properties: updatedBlock.properties,
+      position: updatedBlock.position,
+      depth: updatedBlock.depth,
+      last_edited_by: userId.toString(),
+      updated_at: updatedBlock.updatedAt.toISOString(),
+    });
+
+    // Broadcast real-time update
+    if (this.websocketService) {
+      this.websocketService.broadcastBlockUpdate(pageUuid, {
+        uuid: updatedBlock.uuid,
+        type: updatedBlock.type,
+        content: updatedBlock.content,
+        properties: updatedBlock.properties,
+        position: updatedBlock.position,
+        depth: updatedBlock.depth,
+      });
+    }
+
+    return updatedBlock;
   }
 
   async deleteBlock(blockUuid: string, pageUuid: string, userId: bigint) {
@@ -115,7 +182,18 @@ export class BlockService {
       throw new Error('Block does not belong to this page');
     }
 
-    return this.blockRepo.softDelete(block.id);
+    await this.blockRepo.softDelete(block.id);
+
+    // Remove from Yjs document
+    const blocksMap = YjsSetup.getBlocksMap(pageUuid);
+    blocksMap.delete(blockUuid);
+
+    // Broadcast real-time update
+    if (this.websocketService) {
+      this.websocketService.broadcastBlockDelete(pageUuid, blockUuid);
+    }
+
+    return { success: true };
   }
 
   extractContentText(content: Record<string, any>): string {

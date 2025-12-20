@@ -30,13 +30,21 @@ class ApiService {
     // Response interceptor for error handling
     this.client.interceptors.response.use(
       (response) => response,
-      (error: AxiosError) => {
+      (error: AxiosError<any>) => {
         if (error.response?.status === 401) {
           // Handle unauthorized - clear token and redirect to login
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
-          window.location.href = '/login';
+          if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+            window.location.href = '/login';
+          }
         }
+        
+        // Extract error message from response
+        if (error.response?.data?.error?.message) {
+          error.message = error.response.data.error.message;
+        }
+        
         return Promise.reject(error);
       }
     );

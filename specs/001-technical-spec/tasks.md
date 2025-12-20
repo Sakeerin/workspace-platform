@@ -101,34 +101,34 @@
 
 ### Implementation for User Story 1
 
-- [ ] T051 [P] [US1] Create User model in backend/src/models/user.model.ts
-- [ ] T052 [P] [US1] Create Workspace model in backend/src/models/workspace.model.ts
-- [ ] T053 [P] [US1] Create WorkspaceMember model in backend/src/models/workspace-member.model.ts
-- [ ] T054 [US1] Create User repository in backend/src/repositories/user.repository.ts (depends on T051)
-- [ ] T055 [US1] Create Workspace repository in backend/src/repositories/workspace.repository.ts (depends on T052)
-- [ ] T056 [US1] Create WorkspaceMember repository in backend/src/repositories/workspace-member.repository.ts (depends on T053)
-- [ ] T057 [US1] Create AuthService in backend/src/services/auth.service.ts (depends on T054, T028, T029)
-- [ ] T058 [US1] Create WorkspaceService in backend/src/services/workspace.service.ts (depends on T055, T056)
-- [ ] T059 [US1] Create PermissionService in backend/src/services/permission.service.ts (depends on T056)
-- [ ] T060 [US1] Create AuthController in backend/src/controllers/auth.controller.ts (depends on T057)
-- [ ] T061 [US1] Create WorkspaceController in backend/src/controllers/workspace.controller.ts (depends on T058)
-- [ ] T062 [US1] Create auth routes in backend/src/routes/auth.routes.ts (depends on T060)
-- [ ] T063 [US1] Create workspace routes in backend/src/routes/workspace.routes.ts (depends on T061)
-- [ ] T064 [US1] Create auth DTOs in backend/src/dto/auth.dto.ts
-- [ ] T065 [US1] Create workspace DTOs in backend/src/dto/workspace.dto.ts
-- [ ] T066 [US1] Create auth validators in backend/src/validators/auth.validator.ts
-- [ ] T067 [US1] Create workspace validators in backend/src/validators/workspace.validator.ts
-- [ ] T068 [US1] Create auth store (Zustand) in frontend/src/store/auth.ts
-- [ ] T069 [US1] Create workspace store (Zustand) in frontend/src/store/workspace.ts
-- [ ] T070 [US1] Create Login page component in frontend/src/pages/Auth/Login.tsx
-- [ ] T071 [US1] Create Register page component in frontend/src/pages/Auth/Register.tsx
-- [ ] T072 [US1] Create WorkspaceList page component in frontend/src/pages/Workspace/WorkspaceList.tsx
-- [ ] T073 [US1] Create WorkspaceCreate page component in frontend/src/pages/Workspace/WorkspaceCreate.tsx
-- [ ] T074 [US1] Create WorkspaceSettings page component in frontend/src/pages/Workspace/WorkspaceSettings.tsx
-- [ ] T075 [US1] Add authentication routes to frontend/src/router/index.tsx (depends on T070, T071)
-- [ ] T076 [US1] Add workspace routes to frontend/src/router/index.tsx (depends on T072, T073, T074)
-- [ ] T077 [US1] Implement protected route wrapper in frontend/src/components/Common/ProtectedRoute.tsx
-- [ ] T078 [US1] Add error handling for auth operations in frontend/src/services/api.ts
+- [x] T051 [P] [US1] Create User model in backend/src/models/user.model.ts
+- [x] T052 [P] [US1] Create Workspace model in backend/src/models/workspace.model.ts
+- [x] T053 [P] [US1] Create WorkspaceMember model in backend/src/models/workspace-member.model.ts
+- [x] T054 [US1] Create User repository in backend/src/repositories/user.repository.ts (depends on T051)
+- [x] T055 [US1] Create Workspace repository in backend/src/repositories/workspace.repository.ts (depends on T052)
+- [x] T056 [US1] Create WorkspaceMember repository in backend/src/repositories/workspace-member.repository.ts (depends on T053)
+- [x] T057 [US1] Create AuthService in backend/src/services/auth.service.ts (depends on T054, T028, T029)
+- [x] T058 [US1] Create WorkspaceService in backend/src/services/workspace.service.ts (depends on T055, T056)
+- [x] T059 [US1] Create PermissionService in backend/src/services/permission.service.ts (depends on T056)
+- [x] T060 [US1] Create AuthController in backend/src/controllers/auth.controller.ts (depends on T057)
+- [x] T061 [US1] Create WorkspaceController in backend/src/controllers/workspace.controller.ts (depends on T058)
+- [x] T062 [US1] Create auth routes in backend/src/routes/auth.routes.ts (depends on T060) - Integrated into NestJS controllers
+- [x] T063 [US1] Create workspace routes in backend/src/routes/workspace.routes.ts (depends on T061) - Integrated into NestJS controllers
+- [x] T064 [US1] Create auth DTOs in backend/src/dto/auth.dto.ts
+- [x] T065 [US1] Create workspace DTOs in backend/src/dto/workspace.dto.ts
+- [x] T066 [US1] Create auth validators in backend/src/validators/auth.validator.ts
+- [x] T067 [US1] Create workspace validators in backend/src/validators/workspace.validator.ts
+- [x] T068 [US1] Create auth store (Zustand) in frontend/src/store/auth.ts
+- [x] T069 [US1] Create workspace store (Zustand) in frontend/src/store/workspace.ts
+- [x] T070 [US1] Create Login page component in frontend/src/pages/Auth/Login.tsx
+- [x] T071 [US1] Create Register page component in frontend/src/pages/Auth/Register.tsx
+- [x] T072 [US1] Create WorkspaceList page component in frontend/src/pages/Workspace/WorkspaceList.tsx
+- [x] T073 [US1] Create WorkspaceCreate page component in frontend/src/pages/Workspace/WorkspaceCreate.tsx
+- [x] T074 [US1] Create WorkspaceSettings page component in frontend/src/pages/Workspace/WorkspaceSettings.tsx
+- [x] T075 [US1] Add authentication routes to frontend/src/router/index.tsx (depends on T070, T071)
+- [x] T076 [US1] Add workspace routes to frontend/src/router/index.tsx (depends on T072, T073, T074)
+- [x] T077 [US1] Implement protected route wrapper in frontend/src/components/Common/ProtectedRoute.tsx
+- [x] T078 [US1] Add error handling for auth operations in frontend/src/services/api.ts
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently. Users can register, login, create workspaces, and manage members.
 

@@ -6,6 +6,7 @@ import WorkspaceList from '../pages/Workspace/WorkspaceList';
 import WorkspaceCreate from '../pages/Workspace/WorkspaceCreate';
 import WorkspaceSettings from '../pages/Workspace/WorkspaceSettings';
 import PageEditor from '../pages/Page/PageEditor';
+import DatabaseEditor from '../pages/Database/DatabaseEditor';
 import ProtectedRoute from '../components/Common/ProtectedRoute';
 
 const router = createBrowserRouter([
@@ -50,6 +51,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <PageEditor />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: 'workspaces/:workspaceId/databases/:pageId',
+        element: (
+          <ProtectedRoute>
+            <DatabaseEditor />
           </ProtectedRoute>
         ),
       },

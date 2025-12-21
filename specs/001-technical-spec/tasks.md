@@ -238,33 +238,33 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T137 [P] [US4] Create unit test for Database model in backend/tests/unit/models/database.test.ts
-- [ ] T138 [P] [US4] Create unit test for DatabaseRow model in backend/tests/unit/models/database-row.test.ts
-- [ ] T139 [P] [US4] Create integration test for database creation in backend/tests/integration/database/create.test.ts
-- [ ] T140 [P] [US4] Create integration test for database row operations in backend/tests/integration/database/rows.test.ts
-- [ ] T141 [P] [US4] Create contract test for POST /api/v1/databases/:uuid/rows in backend/tests/contract/database/rows.contract.test.ts
+- [x] T137 [P] [US4] Create unit test for Database model in backend/tests/unit/models/database.test.ts
+- [x] T138 [P] [US4] Create unit test for DatabaseRow model in backend/tests/unit/models/database-row.test.ts
+- [x] T139 [P] [US4] Create integration test for database creation in backend/tests/integration/database/create.test.ts
+- [x] T140 [P] [US4] Create integration test for database row operations in backend/tests/integration/database/rows.test.ts
+- [x] T141 [P] [US4] Create contract test for POST /api/v1/databases/:uuid/rows in backend/tests/contract/database/rows.contract.test.ts
 - [ ] T142 [P] [US4] Create E2E test for database creation flow in frontend/tests/e2e/database/create.spec.ts
 
 ### Implementation for User Story 4
 
-- [ ] T143 [P] [US4] Create Database model in backend/src/models/database.model.ts
-- [ ] T144 [P] [US4] Create DatabaseRow model in backend/src/models/database-row.model.ts
-- [ ] T145 [US4] Create Database repository in backend/src/repositories/database.repository.ts (depends on T143)
-- [ ] T146 [US4] Create DatabaseRow repository in backend/src/repositories/database-row.repository.ts (depends on T144)
-- [ ] T147 [US4] Create DatabaseService in backend/src/services/database.service.ts (depends on T145, T146, T092)
-- [ ] T148 [US4] Create DatabaseController in backend/src/controllers/database.controller.ts (depends on T147)
-- [ ] T149 [US4] Create database routes in backend/src/routes/database.routes.ts (depends on T148)
-- [ ] T150 [US4] Create database DTOs in backend/src/dto/database.dto.ts
-- [ ] T151 [US4] Create database validators in backend/src/validators/database.validator.ts
-- [ ] T152 [US4] Create DatabaseView component in frontend/src/components/Database/DatabaseView.tsx
-- [ ] T153 [US4] Create TableView component in frontend/src/components/Database/TableView.tsx
-- [ ] T154 [US4] Create BoardView component in frontend/src/components/Database/BoardView.tsx
-- [ ] T155 [US4] Create CalendarView component in frontend/src/components/Database/CalendarView.tsx
-- [ ] T156 [US4] Create database store (Zustand) in frontend/src/store/database.ts
-- [ ] T157 [US4] Create DatabaseEditor page component in frontend/src/pages/Database/DatabaseEditor.tsx (depends on T152)
-- [ ] T158 [US4] Add database routes to frontend/src/router/index.tsx (depends on T157)
-- [ ] T159 [US4] Implement property type system in frontend/src/types/database.types.ts
-- [ ] T160 [US4] Implement formula calculations in backend/src/services/database.service.ts (depends on T147)
+- [x] T143 [P] [US4] Create Database model in backend/src/models/database.model.ts
+- [x] T144 [P] [US4] Create DatabaseRow model in backend/src/models/database-row.model.ts
+- [x] T145 [US4] Create Database repository in backend/src/repositories/database.repository.ts (depends on T143)
+- [x] T146 [US4] Create DatabaseRow repository in backend/src/repositories/database-row.repository.ts (depends on T144)
+- [x] T147 [US4] Create DatabaseService in backend/src/services/database.service.ts (depends on T145, T146, T092)
+- [x] T148 [US4] Create DatabaseController in backend/src/controllers/database.controller.ts (depends on T147)
+- [x] T149 [US4] Create database routes in backend/src/routes/database.routes.ts (depends on T148)
+- [x] T150 [US4] Create database DTOs in backend/src/dto/database.dto.ts
+- [x] T151 [US4] Create database validators in backend/src/validators/database.validator.ts
+- [x] T152 [US4] Create DatabaseView component in frontend/src/components/Database/DatabaseView.tsx
+- [x] T153 [US4] Create TableView component in frontend/src/components/Database/TableView.tsx
+- [x] T154 [US4] Create BoardView component in frontend/src/components/Database/BoardView.tsx
+- [x] T155 [US4] Create CalendarView component in frontend/src/components/Database/CalendarView.tsx
+- [x] T156 [US4] Create database store (Zustand) in frontend/src/store/database.ts
+- [x] T157 [US4] Create DatabaseEditor page component in frontend/src/pages/Database/DatabaseEditor.tsx (depends on T152)
+- [x] T158 [US4] Add database routes to frontend/src/router/index.tsx (depends on T157)
+- [x] T159 [US4] Implement property type system in frontend/src/types/database.types.ts
+- [x] T160 [US4] Implement formula calculations in backend/src/services/database.service.ts (depends on T147)
 
 **Checkpoint**: At this point, User Story 4 should be fully functional. Users can create databases, manage properties, add rows, and switch between views.
 

@@ -4,16 +4,20 @@ import { AuthController } from './controllers/auth.controller';
 import { WorkspaceController } from './controllers/workspace.controller';
 import { PageController } from './controllers/page.controller';
 import { BlockController } from './controllers/block.controller';
+import { DatabaseController } from './controllers/database.controller';
 import { AuthService } from './services/auth.service';
 import { WorkspaceService } from './services/workspace.service';
 import { PageService } from './services/page.service';
 import { BlockService } from './services/block.service';
+import { DatabaseService } from './services/database.service';
 import { PermissionService } from './services/permission.service';
 import { UserRepository } from './repositories/user.repository';
 import { WorkspaceRepository } from './repositories/workspace.repository';
 import { WorkspaceMemberRepository } from './repositories/workspace-member.repository';
 import { PageRepository } from './repositories/page.repository';
 import { BlockRepository } from './repositories/block.repository';
+import { DatabaseRepository } from './repositories/database.repository';
+import { DatabaseRowRepository } from './repositories/database-row.repository';
 
 @Module({
   imports: [
@@ -21,18 +25,21 @@ import { BlockRepository } from './repositories/block.repository';
       isGlobal: true,
     }),
   ],
-  controllers: [AuthController, WorkspaceController, PageController, BlockController],
+  controllers: [AuthController, WorkspaceController, PageController, BlockController, DatabaseController],
   providers: [
     AuthService,
     WorkspaceService,
     PageService,
     BlockService,
+    DatabaseService,
     PermissionService,
     UserRepository,
     WorkspaceRepository,
     WorkspaceMemberRepository,
     PageRepository,
     BlockRepository,
+    DatabaseRepository,
+    DatabaseRowRepository,
   ],
 })
 export class AppModule {}

@@ -7,6 +7,7 @@ import { useAuthStore } from '../../store/auth';
 import BlockEditor from '../../components/Editor/BlockEditor';
 import PresenceIndicator from '../../components/Editor/PresenceIndicator';
 import LiveCursor from '../../components/Editor/LiveCursor';
+import CommentThread from '../../components/Comments/CommentThread';
 
 export default function PageEditor() {
   const { workspaceId, pageId } = useParams<{ workspaceId: string; pageId: string }>();
@@ -178,6 +179,13 @@ export default function PageEditor() {
             onBlockUpdate={handleBlockUpdate}
             onBlockDelete={handleBlockDelete}
           />
+        )}
+
+        {/* Comments Section */}
+        {pageId && currentPage?.allowComments !== false && (
+          <div className="mt-12">
+            <CommentThread pageUuid={pageId} />
+          </div>
         )}
       </div>
     </div>

@@ -280,29 +280,29 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T161 [P] [US5] Create unit test for Comment model in backend/tests/unit/models/comment.test.ts
-- [ ] T162 [P] [US5] Create integration test for comment creation in backend/tests/integration/comment/create.test.ts
-- [ ] T163 [P] [US5] Create integration test for comment threading in backend/tests/integration/comment/threading.test.ts
-- [ ] T164 [P] [US5] Create contract test for POST /api/v1/pages/:uuid/comments in backend/tests/contract/comment/create.contract.test.ts
-- [ ] T165 [P] [US5] Create E2E test for comment flow in frontend/tests/e2e/comment/create.spec.ts
+- [x] T161 [P] [US5] Create unit test for Comment model in backend/tests/unit/models/comment.test.ts
+- [x] T162 [P] [US5] Create integration test for comment creation in backend/tests/integration/comment/create.test.ts
+- [x] T163 [P] [US5] Create integration test for comment threading in backend/tests/integration/comment/threading.test.ts
+- [x] T164 [P] [US5] Create contract test for POST /api/v1/pages/:uuid/comments in backend/tests/contract/comment/create.contract.test.ts
+- [x] T165 [P] [US5] Create E2E test for comment flow in frontend/tests/e2e/comment/create.spec.ts
 
 ### Implementation for User Story 5
 
-- [ ] T166 [P] [US5] Create Comment model in backend/src/models/comment.model.ts
-- [ ] T167 [US5] Create Comment repository in backend/src/repositories/comment.repository.ts (depends on T166)
-- [ ] T168 [US5] Create CommentService in backend/src/services/comment.service.ts (depends on T167, T092, T059)
-- [ ] T169 [US5] Create NotificationService in backend/src/services/notification.service.ts (depends on T168)
-- [ ] T170 [US5] Create CommentController in backend/src/controllers/comment.controller.ts (depends on T168)
-- [ ] T171 [US5] Create comment routes in backend/src/routes/comment.routes.ts (depends on T170)
-- [ ] T172 [US5] Create comment DTOs in backend/src/dto/comment.dto.ts
-- [ ] T173 [US5] Create comment validators in backend/src/validators/comment.validator.ts
-- [ ] T174 [US5] Create comment event handler in backend/src/websocket/handlers/comment.handler.ts (depends on T168)
-- [ ] T175 [US5] Create CommentThread component in frontend/src/components/Comments/CommentThread.tsx
-- [ ] T176 [US5] Create CommentItem component in frontend/src/components/Comments/CommentItem.tsx
-- [ ] T177 [US5] Create comment store (Zustand) in frontend/src/store/comments.ts
-- [ ] T178 [US5] Integrate comments into PageEditor in frontend/src/pages/Page/PageEditor.tsx (depends on T111)
-- [ ] T179 [US5] Implement @ mention parsing in backend/src/services/comment.service.ts (depends on T168)
-- [ ] T180 [US5] Implement notification creation on mentions in backend/src/services/notification.service.ts (depends on T169)
+- [x] T166 [P] [US5] Create Comment model in backend/src/models/comment.model.ts
+- [x] T167 [US5] Create Comment repository in backend/src/repositories/comment.repository.ts (depends on T166)
+- [x] T168 [US5] Create CommentService in backend/src/services/comment.service.ts (depends on T167, T092, T059)
+- [x] T169 [US5] Create NotificationService in backend/src/services/notification.service.ts (depends on T168)
+- [x] T170 [US5] Create CommentController in backend/src/controllers/comment.controller.ts (depends on T168)
+- [x] T171 [US5] Create comment routes in backend/src/routes/comment.routes.ts (depends on T170)
+- [x] T172 [US5] Create comment DTOs in backend/src/dto/comment.dto.ts
+- [x] T173 [US5] Create comment validators in backend/src/validators/comment.validator.ts
+- [x] T174 [US5] Create comment event handler in backend/src/websocket/handlers/comment.handler.ts (depends on T168)
+- [x] T175 [US5] Create CommentThread component in frontend/src/components/Comments/CommentThread.tsx
+- [x] T176 [US5] Create CommentItem component in frontend/src/components/Comments/CommentItem.tsx
+- [x] T177 [US5] Create comment store (Zustand) in frontend/src/store/comments.ts
+- [x] T178 [US5] Integrate comments into PageEditor in frontend/src/pages/Page/PageEditor.tsx (depends on T111)
+- [x] T179 [US5] Implement @ mention parsing in backend/src/services/comment.service.ts (depends on T168)
+- [x] T180 [US5] Implement notification creation on mentions in backend/src/services/notification.service.ts (depends on T169)
 
 **Checkpoint**: At this point, User Story 5 should be fully functional. Users can add comments, mention users, and have threaded discussions.
 

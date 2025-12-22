@@ -12,6 +12,12 @@ export class PageRepository extends BaseRepository<Page> {
     return this.prisma.page;
   }
 
+  async findById(id: bigint): Promise<Page | null> {
+    return this.getModel().findUnique({
+      where: { id },
+    });
+  }
+
   async findByUuid(uuid: string): Promise<Page | null> {
     return this.getModel().findUnique({
       where: { uuid },

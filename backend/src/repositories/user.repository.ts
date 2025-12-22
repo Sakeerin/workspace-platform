@@ -18,6 +18,12 @@ export class UserRepository extends BaseRepository<User> {
     });
   }
 
+  async findById(id: bigint): Promise<User | null> {
+    return this.getModel().findUnique({
+      where: { id },
+    });
+  }
+
   async findByUuid(uuid: string): Promise<User | null> {
     return this.getModel().findUnique({
       where: { uuid },

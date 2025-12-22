@@ -318,28 +318,28 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T181 [P] [US6] Create integration test for search functionality in backend/tests/integration/search/search.test.ts
-- [ ] T182 [P] [US6] Create integration test for favorites in backend/tests/integration/favorites/favorites.test.ts
-- [ ] T183 [P] [US6] Create contract test for GET /api/v1/workspaces/:uuid/search in backend/tests/contract/search/search.contract.test.ts
-- [ ] T184 [P] [US6] Create E2E test for search flow in frontend/tests/e2e/search/search.spec.ts
+- [x] T181 [P] [US6] Create integration test for search functionality in backend/tests/integration/search/search.test.ts
+- [x] T182 [P] [US6] Create integration test for favorites in backend/tests/integration/favorites/favorites.test.ts
+- [x] T183 [P] [US6] Create contract test for GET /api/v1/workspaces/:uuid/search in backend/tests/contract/search/search.contract.test.ts
+- [x] T184 [P] [US6] Create E2E test for search flow in frontend/tests/e2e/search/search.spec.ts
 
 ### Implementation for User Story 6
 
-- [ ] T185 [US6] Setup Meilisearch client in backend/src/config/search.ts
-- [ ] T186 [US6] Create SearchService in backend/src/services/search.service.ts (depends on T185, T090, T091)
-- [ ] T187 [US6] Create SearchController in backend/src/controllers/search.controller.ts (depends on T186)
-- [ ] T188 [US6] Create search routes in backend/src/routes/search.routes.ts (depends on T187)
-- [ ] T189 [US6] Create search index listener in backend/src/listeners/search-index.listener.ts (depends on T186)
-- [ ] T190 [US6] Create Favorites model in backend/src/models/favorite.model.ts
-- [ ] T191 [US6] Create Favorites repository in backend/src/repositories/favorite.repository.ts (depends on T190)
-- [ ] T192 [US6] Add favorites endpoints to page routes in backend/src/routes/page.routes.ts (depends on T191)
-- [ ] T193 [US6] Create QuickSearch component in frontend/src/components/Search/QuickSearch.tsx
-- [ ] T194 [US6] Create SearchResults component in frontend/src/components/Search/SearchResults.tsx
-- [ ] T195 [US6] Create Sidebar component in frontend/src/components/Sidebar/Sidebar.tsx (depends on T112)
-- [ ] T196 [US6] Create WorkspaceSwitcher component in frontend/src/components/Sidebar/WorkspaceSwitcher.tsx
-- [ ] T197 [US6] Implement keyboard shortcut (Cmd/Ctrl+K) for search in frontend/src/hooks/useKeyboardShortcuts.ts
-- [ ] T198 [US6] Create favorites functionality in frontend/src/store/pages.ts (depends on T102)
-- [ ] T199 [US6] Implement recently viewed tracking in frontend/src/store/pages.ts (depends on T102)
+- [x] T185 [US6] Setup Meilisearch client in backend/src/config/search.ts
+- [x] T186 [US6] Create SearchService in backend/src/services/search.service.ts (depends on T185, T090, T091)
+- [x] T187 [US6] Create SearchController in backend/src/controllers/search.controller.ts (depends on T186)
+- [x] T188 [US6] Create search routes in backend/src/routes/search.routes.ts (depends on T187)
+- [x] T189 [US6] Create search index listener in backend/src/listeners/search-index.listener.ts (depends on T186)
+- [x] T190 [US6] Create Favorites model in backend/src/models/favorite.model.ts
+- [x] T191 [US6] Create Favorites repository in backend/src/repositories/favorite.repository.ts (depends on T190)
+- [x] T192 [US6] Add favorites endpoints to page routes in backend/src/routes/page.routes.ts (depends on T191)
+- [x] T193 [US6] Create QuickSearch component in frontend/src/components/Search/QuickSearch.tsx
+- [x] T194 [US6] Create SearchResults component in frontend/src/components/Search/SearchResults.tsx
+- [x] T195 [US6] Create Sidebar component in frontend/src/components/Sidebar/Sidebar.tsx (depends on T112)
+- [x] T196 [US6] Create WorkspaceSwitcher component in frontend/src/components/Sidebar/WorkspaceSwitcher.tsx
+- [x] T197 [US6] Implement keyboard shortcut (Cmd/Ctrl+K) for search in frontend/src/hooks/useKeyboardShortcuts.ts
+- [x] T198 [US6] Create favorites functionality in frontend/src/store/pages.ts (depends on T102)
+- [x] T199 [US6] Implement recently viewed tracking in frontend/src/store/pages.ts (depends on T102)
 
 **Checkpoint**: At this point, User Story 6 should be fully functional. Users can search, favorite pages, and navigate efficiently.
 

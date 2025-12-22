@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { PageService } from '../services/page.service';
 import { UserRepository } from '../repositories/user.repository';
+import { FavoriteRepository } from '../repositories/favorite.repository';
 import { CreatePageDto, UpdatePageDto } from '../dto/page.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
@@ -21,7 +22,8 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 export class PageController {
   constructor(
     private readonly pageService: PageService,
-    private readonly userRepo: UserRepository
+    private readonly userRepo: UserRepository,
+    private readonly favoriteRepo: FavoriteRepository
   ) {}
 
   @Post()
@@ -103,6 +105,87 @@ export class PageController {
     }
 
     await this.pageService.deletePage(pageUuid, user.id);
+  }
+
+  @Post(':pageUuid/favorite')
+  @HttpCode(HttpStatus.CREATED)
+  async addFavorite(@Param('pageUuid') pageUuid: string, @Request() req: any) {
+    const userUuid = req.user.userId;
+    const user = await this.userRepo.findByUuid(userUuid);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const page = await this.pageService.getPage(pageUuid, user.id);
+    if (!page) {
+      throw new Error('Page not found');
+    }
+
+    // Check if already favorited
+    const existing = await this.favoriteRepo.findByUserAndPage(user.id, page.id);
+    if (existing) {
+      throw new Error('Page is already in favorites');
+    }
+
+    const favorite = await this.favoriteRepo.create({
+      userId: user.id,
+      pageId: page.id,
+    });
+
+    return {
+      success: true,
+      data: {
+        page_id: pageUuid,
+        created_at: favorite.createdAt,
+      },
+    };
+  }
+
+  @Delete(':pageUuid/favorite')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeFavorite(@Param('pageUuid') pageUuid: string, @Request() req: any) {
+    const userUuid = req.user.userId;
+    const user = await this.userRepo.findByUuid(userUuid);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const page = await this.pageService.getPage(pageUuid, user.id);
+    if (!page) {
+      throw new Error('Page not found');
+    }
+
+    const favorite = await this.favoriteRepo.findByUserAndPage(user.id, page.id);
+    if (!favorite) {
+      throw new Error('Favorite not found');
+    }
+
+    await this.favoriteRepo.delete(user.id, page.id);
+  }
+
+  @Get('favorites')
+  async getFavorites(@Request() req: any) {
+    const userUuid = req.user.userId;
+    const user = await this.userRepo.findByUuid(userUuid);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const favorites = await this.favoriteRepo.findByUserId(user.id);
+    const pages = favorites.map((fav) => ({
+      uuid: fav.page.uuid,
+      title: fav.page.title,
+      icon: fav.page.icon,
+      type: fav.page.type,
+      visibility: fav.page.visibility,
+      updated_at: fav.page.updatedAt,
+      favorited_at: fav.createdAt,
+    }));
+
+    return {
+      success: true,
+      data: pages,
+    };
   }
 }
 

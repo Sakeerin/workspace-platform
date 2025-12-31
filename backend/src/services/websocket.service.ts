@@ -98,7 +98,7 @@ export class WebSocketService {
   /**
    * Get presence information for a page
    */
-  getPresence(pageUuid: string) {
+  getPresence(pageUuid: string): Map<string, import('../websocket/handlers/presence.handler').PresenceData> {
     return this.presenceHandler.getPresence(pageUuid);
   }
 }

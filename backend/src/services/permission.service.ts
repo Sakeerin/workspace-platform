@@ -1,7 +1,9 @@
+import { Injectable } from '@nestjs/common';
 import { WorkspaceMemberRepository } from '../repositories/workspace-member.repository';
 
 export type Permission = 'view' | 'comment' | 'edit' | 'full_access';
 
+@Injectable()
 export class PermissionService {
   constructor(private workspaceMemberRepo: WorkspaceMemberRepository) {}
 

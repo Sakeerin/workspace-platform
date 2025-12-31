@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import { WorkspaceRepository } from '../repositories/workspace.repository';
 import { WorkspaceMemberRepository } from '../repositories/workspace-member.repository';
@@ -5,6 +6,18 @@ import { EncryptionService } from '../utils/encryption';
 import { JWTService, TokenPair } from '../utils/jwt';
 import { RegisterDto, LoginDto } from '../dto/auth.dto';
 
+/**
+ * Authentication Service
+ * 
+ * Handles user authentication and authorization:
+ * - User registration with workspace creation
+ * - User login with JWT token generation
+ * - Token refresh
+ * - Password hashing and verification
+ * 
+ * @class AuthService
+ */
+@Injectable()
 export class AuthService {
   constructor(
     private userRepo: UserRepository,
@@ -12,6 +25,23 @@ export class AuthService {
     private workspaceMemberRepo: WorkspaceMemberRepository
   ) {}
 
+  /**
+   * Register a new user
+   * 
+   * Creates a new user account, hashes the password, creates a default workspace,
+   * and generates JWT tokens for immediate authentication.
+   * 
+   * @param {RegisterDto} dto - Registration data (email, password, name)
+   * @returns {Promise<{user: any, tokens: TokenPair}>} User data and JWT tokens
+   * @throws {Error} If user with email already exists
+   * 
+   * @example
+   * const result = await authService.register({
+   *   email: 'user@example.com',
+   *   password: 'securePassword123',
+   *   name: 'John Doe'
+   * });
+   */
   async register(dto: RegisterDto): Promise<{ user: any; tokens: TokenPair }> {
     // Check if user already exists
     const existingUser = await this.userRepo.findByEmail(dto.email);
@@ -60,6 +90,22 @@ export class AuthService {
     };
   }
 
+  /**
+   * Authenticate user and generate tokens
+   * 
+   * Validates user credentials, checks if account is active, updates last login,
+   * and generates new JWT tokens.
+   * 
+   * @param {LoginDto} dto - Login credentials (email, password)
+   * @returns {Promise<{user: any, tokens: TokenPair}>} User data and JWT tokens
+   * @throws {Error} If credentials are invalid or account is inactive
+   * 
+   * @example
+   * const result = await authService.login({
+   *   email: 'user@example.com',
+   *   password: 'securePassword123'
+   * });
+   */
   async login(dto: LoginDto): Promise<{ user: any; tokens: TokenPair }> {
     // Find user
     const user = await this.userRepo.findByEmail(dto.email);

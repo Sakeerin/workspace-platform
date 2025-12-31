@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { PrismaClient, WorkspaceMember } from '@prisma/client';
 import { BaseRepository } from './base.repository';
 import {
@@ -6,6 +7,7 @@ import {
 } from '../models/workspace-member.model';
 import prisma from '../config/database';
 
+@Injectable()
 export class WorkspaceMemberRepository extends BaseRepository<WorkspaceMember> {
   constructor() {
     super(prisma);
@@ -62,7 +64,7 @@ export class WorkspaceMemberRepository extends BaseRepository<WorkspaceMember> {
     });
   }
 
-  async update(
+  async updateByWorkspaceAndUser(
     workspaceId: bigint,
     userId: bigint,
     data: WorkspaceMemberUpdateInput

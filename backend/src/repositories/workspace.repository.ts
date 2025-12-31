@@ -1,8 +1,10 @@
+import { Injectable } from '@nestjs/common';
 import { PrismaClient, Workspace } from '@prisma/client';
 import { BaseRepository } from './base.repository';
 import { WorkspaceCreateInput, WorkspaceUpdateInput } from '../models/workspace.model';
 import prisma from '../config/database';
 
+@Injectable()
 export class WorkspaceRepository extends BaseRepository<Workspace> {
   constructor() {
     super(prisma);

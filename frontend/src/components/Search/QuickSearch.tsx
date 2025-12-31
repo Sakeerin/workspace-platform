@@ -98,25 +98,35 @@ export default function QuickSearch({ isOpen, onClose, workspaceUuid }: QuickSea
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-start justify-center pt-20"
-      onClick={onClose}
-    >
       <div
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl mx-4"
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-50 flex items-start justify-center pt-20"
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search dialog"
       >
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <input
-            ref={inputRef}
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Search pages, blocks, and databases..."
-            className="w-full px-4 py-2 text-lg border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-          />
-        </div>
+        <div
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl mx-4"
+          onClick={(e) => e.stopPropagation()}
+          role="search"
+          aria-label="Quick search"
+        >
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Search pages, blocks, and databases..."
+              className="w-full px-4 py-2 text-lg border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              aria-label="Search input"
+              aria-describedby="search-hint"
+            />
+            <p id="search-hint" className="sr-only">
+              Use arrow keys to navigate results, Enter to select, Escape to close
+            </p>
+          </div>
         {isLoading && (
           <div className="p-4 text-center text-gray-500">Searching...</div>
         )}

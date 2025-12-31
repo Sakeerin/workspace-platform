@@ -98,7 +98,7 @@ model Workspace {
   icon          String?   @db.VarChar(50)
   coverImage    String?   @map("cover_image") @db.Text
   settings      Json      @default("{}")
-  plan          WorkspacePlan @default(free) @db.VarChar(50)
+  plan          WorkspacePlan @default(free)
   planExpiresAt DateTime? @map("plan_expires_at") @db.Timestamp
   maxMembers    Int       @default(10) @map("max_members")
   maxStorageGb  Int       @default(5) @map("max_storage_gb")
@@ -337,7 +337,7 @@ model PagePermission {
   pageId        BigInt        @map("page_id") @db.BigInt
   userId        BigInt?       @map("user_id") @db.BigInt
   teamId        BigInt?       @map("team_id") @db.BigInt
-  permissionType PermissionType @map("permission_type") @db.VarChar(50)
+  permissionType PermissionType @map("permission_type")
   grantedById   BigInt        @map("granted_by") @db.BigInt
   createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamp
   expiresAt     DateTime?     @map("expires_at") @db.Timestamp
@@ -362,8 +362,8 @@ model File {
   sizeBytes       BigInt   @map("size_bytes") @db.BigInt
   storagePath     String   @map("storage_path") @db.Text
   storageDisk     String   @default("s3") @map("storage_disk") @db.VarChar(50)
-  width           Int?     @db.Int
-  height          Int?     @db.Int
+  width           Int?
+  height          Int?
   pageId          BigInt?  @map("page_id") @db.BigInt
   blockId         BigInt?  @map("block_id") @db.BigInt
   isPublic        Boolean  @default(false) @map("is_public")

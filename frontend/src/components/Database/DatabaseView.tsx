@@ -14,6 +14,29 @@ interface DatabaseViewProps {
   onRowDelete?: (rowUuid: string) => Promise<void>;
 }
 
+/**
+ * Database View Component
+ * 
+ * Renders database content in different view types (table, board, calendar).
+ * Supports switching between views and managing database rows.
+ * 
+ * @param {DatabaseViewProps} props - Component props
+ * @param {Database} props.database - Database configuration
+ * @param {any[]} props.rows - Array of database rows
+ * @param {string} [props.currentViewId] - Currently active view ID
+ * @param {Function} [props.onViewChange] - Callback when view changes
+ * @param {Function} [props.onRowCreate] - Callback when row is created
+ * @param {Function} [props.onRowUpdate] - Callback when row is updated
+ * @param {Function} [props.onRowDelete] - Callback when row is deleted
+ * 
+ * @example
+ * <DatabaseView
+ *   database={databaseData}
+ *   rows={databaseRows}
+ *   onRowCreate={handleRowCreate}
+ *   onRowUpdate={handleRowUpdate}
+ * />
+ */
 export default function DatabaseView({
   database,
   rows,

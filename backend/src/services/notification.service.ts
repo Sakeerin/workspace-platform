@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { PrismaClient, Notification } from '@prisma/client';
 import { UserRepository } from '../repositories/user.repository';
 import { WorkspaceRepository } from '../repositories/workspace.repository';
@@ -17,6 +18,7 @@ export interface CreateNotificationInput {
   triggeredById?: bigint;
 }
 
+@Injectable()
 export class NotificationService {
   private prisma: PrismaClient;
 

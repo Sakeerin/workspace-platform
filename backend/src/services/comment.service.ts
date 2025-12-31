@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { CommentRepository } from '../repositories/comment.repository';
 import { PageRepository } from '../repositories/page.repository';
 import { BlockRepository } from '../repositories/block.repository';
@@ -5,6 +6,7 @@ import { UserRepository } from '../repositories/user.repository';
 import { PermissionService } from './permission.service';
 import { CreateCommentDto, UpdateCommentDto } from '../dto/comment.dto';
 
+@Injectable()
 export class CommentService {
   constructor(
     private commentRepo: CommentRepository,

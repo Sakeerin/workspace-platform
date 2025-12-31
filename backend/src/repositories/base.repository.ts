@@ -5,7 +5,7 @@ export abstract class BaseRepository<T> {
 
   abstract getModel(): any;
 
-  async findById(id: number): Promise<T | null> {
+  async findById(id: bigint | number): Promise<T | null> {
     return this.getModel().findUnique({
       where: { id },
     });
@@ -27,20 +27,20 @@ export abstract class BaseRepository<T> {
     });
   }
 
-  async update(id: number, data: Partial<T>): Promise<T> {
+  async update(id: bigint | number, data: Partial<T>): Promise<T> {
     return this.getModel().update({
       where: { id },
       data,
     });
   }
 
-  async delete(id: number): Promise<T> {
+  async delete(id: bigint | number): Promise<T> {
     return this.getModel().delete({
       where: { id },
     });
   }
 
-  async softDelete(id: number): Promise<T> {
+  async softDelete(id: bigint | number): Promise<T> {
     return this.getModel().update({
       where: { id },
       data: {

@@ -1,8 +1,10 @@
+import { Injectable } from '@nestjs/common';
 import { PrismaClient, Favorite } from '@prisma/client';
 import { BaseRepository } from './base.repository';
 import { FavoriteCreateInput, FavoriteUpdateInput } from '../models/favorite.model';
 import prisma from '../config/database';
 
+@Injectable()
 export class FavoriteRepository extends BaseRepository<Favorite> {
   constructor() {
     super(prisma);
@@ -41,7 +43,7 @@ export class FavoriteRepository extends BaseRepository<Favorite> {
     });
   }
 
-  async findByUserId(userId: bigint): Promise<Favorite[]> {
+  async findByUserId(userId: bigint): Promise<(Favorite & { page: { uuid: string; title: string; icon: string | null; type: string; visibility: string; workspaceId: bigint; updatedAt: Date } })[]> {
     return this.getModel().findMany({
       where: {
         userId,
@@ -54,6 +56,7 @@ export class FavoriteRepository extends BaseRepository<Favorite> {
             icon: true,
             type: true,
             visibility: true,
+            workspaceId: true,
             updatedAt: true,
           },
         },
@@ -94,7 +97,7 @@ export class FavoriteRepository extends BaseRepository<Favorite> {
     });
   }
 
-  async delete(userId: bigint, pageId: bigint): Promise<void> {
+  async deleteByUserIdAndPageId(userId: bigint, pageId: bigint): Promise<void> {
     await this.getModel().delete({
       where: {
         userId_pageId: {

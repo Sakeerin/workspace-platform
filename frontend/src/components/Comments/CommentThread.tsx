@@ -7,6 +7,20 @@ interface CommentThreadProps {
   blockUuid?: string;
 }
 
+/**
+ * Comment Thread Component
+ * 
+ * Displays and manages threaded comments for a page or block.
+ * Supports creating new comments, replying to existing comments,
+ * and resolving comment threads.
+ * 
+ * @param {CommentThreadProps} props - Component props
+ * @param {string} props.pageUuid - UUID of the page
+ * @param {string} [props.blockUuid] - Optional UUID of the block
+ * 
+ * @example
+ * <CommentThread pageUuid="page-uuid" blockUuid="block-uuid" />
+ */
 export default function CommentThread({ pageUuid, blockUuid }: CommentThreadProps) {
   const { comments, isLoading, error, fetchComments, createComment } = useCommentsStore();
   const [newComment, setNewComment] = useState('');

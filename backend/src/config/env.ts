@@ -59,9 +59,14 @@ const requiredEnvVars = [
   'JWT_REFRESH_SECRET',
 ];
 
-if (env.nodeEnv === 'production') {
-  const missing = requiredEnvVars.filter((key) => !process.env[key]);
-  if (missing.length > 0) {
+// Validate in all environments (not just production)
+const missing = requiredEnvVars.filter((key) => !process.env[key] || process.env[key]?.trim() === '');
+if (missing.length > 0) {
+  console.warn(`⚠️  WARNING: Missing required environment variables: ${missing.join(', ')}`);
+  console.warn(`⚠️  Please create a .env file in the backend directory with these variables.`);
+  console.warn(`⚠️  See .env.example for reference.`);
+  
+  if (env.nodeEnv === 'production') {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
 }

@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { PageRepository } from '../repositories/page.repository';
 import { BlockRepository } from '../repositories/block.repository';
 import { PermissionService } from './permission.service';
@@ -21,6 +22,7 @@ export interface SearchOptions {
   offset?: number;
 }
 
+@Injectable()
 export class SearchService {
   constructor(
     private pageRepo: PageRepository,

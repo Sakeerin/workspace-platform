@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { BlockRepository } from '../repositories/block.repository';
 import { PageRepository } from '../repositories/page.repository';
 import { PermissionService } from './permission.service';
@@ -5,6 +6,7 @@ import { CreateBlockDto, UpdateBlockDto } from '../dto/block.dto';
 import { WebSocketService } from './websocket.service';
 import { YjsSetup } from '../websocket/crdt/yjs-setup';
 
+@Injectable()
 export class BlockService {
   private websocketService: WebSocketService | null = null;
 

@@ -26,5 +26,9 @@ export class UpdateBlockDto {
   @IsObject()
   @IsOptional()
   properties?: Record<string, any>;
+
+  @IsInt()
+  @IsOptional()
+  position?: number;
 }
 

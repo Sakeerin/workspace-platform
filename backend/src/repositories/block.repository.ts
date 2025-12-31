@@ -1,8 +1,10 @@
+import { Injectable } from '@nestjs/common';
 import { PrismaClient, Block } from '@prisma/client';
 import { BaseRepository } from './base.repository';
 import { BlockCreateInput, BlockUpdateInput } from '../models/block.model';
 import prisma from '../config/database';
 
+@Injectable()
 export class BlockRepository extends BaseRepository<Block> {
   constructor() {
     super(prisma);
@@ -84,7 +86,7 @@ export class BlockRepository extends BaseRepository<Block> {
     });
   }
 
-  async extractContentText(block: Block): string {
+  async extractContentText(block: Block): Promise<string> {
     // Extract plain text from block content for search indexing
     if (typeof block.content === 'object' && block.content !== null) {
       if ('text' in block.content) {

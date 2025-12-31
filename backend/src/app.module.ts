@@ -22,6 +22,9 @@ import { BlockRepository } from './repositories/block.repository';
 import { DatabaseRepository } from './repositories/database.repository';
 import { DatabaseRowRepository } from './repositories/database-row.repository';
 import { CommentRepository } from './repositories/comment.repository';
+import { FavoriteRepository } from './repositories/favorite.repository';
+import { SearchController } from './controllers/search.controller';
+import { SearchService } from './services/search.service';
 
 @Module({
   imports: [
@@ -29,7 +32,7 @@ import { CommentRepository } from './repositories/comment.repository';
       isGlobal: true,
     }),
   ],
-  controllers: [AuthController, WorkspaceController, PageController, BlockController, DatabaseController, CommentController],
+  controllers: [AuthController, WorkspaceController, PageController, BlockController, DatabaseController, CommentController, SearchController],
   providers: [
     AuthService,
     WorkspaceService,
@@ -39,6 +42,7 @@ import { CommentRepository } from './repositories/comment.repository';
     CommentService,
     NotificationService,
     PermissionService,
+    SearchService,
     UserRepository,
     WorkspaceRepository,
     WorkspaceMemberRepository,
@@ -47,6 +51,7 @@ import { CommentRepository } from './repositories/comment.repository';
     DatabaseRepository,
     DatabaseRowRepository,
     CommentRepository,
+    FavoriteRepository,
   ],
 })
 export class AppModule {}

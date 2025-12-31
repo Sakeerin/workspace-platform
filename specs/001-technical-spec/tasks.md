@@ -349,27 +349,27 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T200 [P] Update API documentation in specs/001-technical-spec/contracts/openapi.yaml
-- [ ] T201 [P] Create comprehensive README.md in repository root
-- [ ] T202 [P] Add code comments and JSDoc to all services in backend/src/services/
-- [ ] T203 [P] Add code comments and JSDoc to all components in frontend/src/components/
-- [ ] T204 [P] Performance optimization: Add Redis caching layer in backend/src/services/cache.service.ts
-- [ ] T205 [P] Performance optimization: Implement lazy loading for routes in frontend/src/router/index.tsx
-- [ ] T206 [P] Performance optimization: Add virtual scrolling for large block lists in frontend/src/components/Editor/BlockRenderer.tsx
-- [ ] T207 [P] Security: Add input sanitization in backend/src/middlewares/sanitize.middleware.ts
-- [ ] T208 [P] Security: Add CSRF protection in backend/src/middlewares/csrf.middleware.ts
-- [ ] T209 [P] Security: Implement rate limiting per endpoint in backend/src/middlewares/rate-limit.middleware.ts (enhance T026)
-- [ ] T210 [P] Error handling: Add error boundary components in frontend/src/components/Common/ErrorBoundary.tsx
-- [ ] T211 [P] Error handling: Improve error messages in frontend/src/services/api.ts
-- [ ] T212 [P] Accessibility: Add ARIA labels to all interactive components in frontend/src/components/
-- [ ] T213 [P] Accessibility: Implement keyboard navigation in frontend/src/components/Editor/
-- [ ] T214 [P] Testing: Increase test coverage to > 80% across all modules
-- [ ] T215 [P] Monitoring: Setup application logging in backend/src/utils/logger.ts (enhance T027)
-- [ ] T216 [P] Monitoring: Add performance monitoring in backend/src/middlewares/performance.middleware.ts
-- [ ] T217 [P] Documentation: Create architecture diagrams in docs/architecture/
-- [ ] T218 [P] Documentation: Create deployment guide in docs/deployment.md
-- [ ] T219 Run quickstart.md validation - verify all setup steps work
-- [ ] T220 Code cleanup and refactoring - remove unused code, optimize imports
+- [x] T200 [P] Update API documentation in specs/001-technical-spec/contracts/openapi.yaml
+- [x] T201 [P] Create comprehensive README.md in repository root
+- [x] T202 [P] Add code comments and JSDoc to all services in backend/src/services/
+- [ ] T203 [P] Add code comments and JSDoc to all components in frontend/src/components/ (Partially complete - key components done)
+- [x] T204 [P] Performance optimization: Add Redis caching layer in backend/src/services/cache.service.ts
+- [x] T205 [P] Performance optimization: Implement lazy loading for routes in frontend/src/router/index.tsx
+- [x] T206 [P] Performance optimization: Add virtual scrolling for large block lists in frontend/src/components/Editor/BlockList.tsx (Note: Requires @tanstack/react-virtual package)
+- [x] T207 [P] Security: Add input sanitization in backend/src/middlewares/sanitize.middleware.ts (Note: Requires isomorphic-dompurify package)
+- [x] T208 [P] Security: Add CSRF protection in backend/src/middlewares/csrf.middleware.ts
+- [x] T209 [P] Security: Implement rate limiting per endpoint in backend/src/middlewares/rate-limit.middleware.ts (enhance T026)
+- [x] T210 [P] Error handling: Add error boundary components in frontend/src/components/Common/ErrorBoundary.tsx
+- [x] T211 [P] Error handling: Improve error messages in frontend/src/services/api.ts
+- [x] T212 [P] Accessibility: Add ARIA labels to all interactive components in frontend/src/components/
+- [x] T213 [P] Accessibility: Implement keyboard navigation in frontend/src/components/Editor/
+- [ ] T214 [P] Testing: Increase test coverage to > 80% across all modules (Requires running test suite)
+- [x] T215 [P] Monitoring: Setup application logging in backend/src/utils/logger.ts (enhance T027)
+- [x] T216 [P] Monitoring: Add performance monitoring in backend/src/middlewares/performance.middleware.ts
+- [ ] T217 [P] Documentation: Create architecture diagrams in docs/architecture/ (Can be created manually or with diagram tools)
+- [x] T218 [P] Documentation: Create deployment guide in docs/deployment.md
+- [ ] T219 Run quickstart.md validation - verify all setup steps work (Requires manual testing)
+- [ ] T220 Code cleanup and refactoring - remove unused code, optimize imports (Ongoing task)
 
 ---
 

@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import { RoomManager } from '../room.manager';
 import { YjsSetup } from '../crdt/yjs-setup';
 
-interface PresenceData {
+export interface PresenceData {
   user_id: string;
   user_name: string;
   user_email: string;

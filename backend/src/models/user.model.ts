@@ -9,6 +9,7 @@ export interface UserCreateInput {
   avatarUrl?: string;
   timezone?: string;
   locale?: string;
+  preferences?: Record<string, any>;
 }
 
 export interface UserUpdateInput {

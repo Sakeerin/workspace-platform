@@ -1,0 +1,93 @@
+version: '3.8'
+
+# Development docker-compose with hot reload
+# Usage: docker-compose -f docker-compose.dev.yml up
+
+services:
+  # Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: workspace-postgres-dev
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-workspace_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - workspace-network
+
+  # Cache
+  redis:
+    image: redis:7-alpine
+    container_name: workspace-redis-dev
+    command: redis-server --appendonly yes
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data_dev:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - workspace-network
+
+  # File Storage
+  minio:
+    image: minio/minio:latest
+    container_name: workspace-minio-dev
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio_data_dev:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - workspace-network
+
+  # Search Engine
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: workspace-meilisearch-dev
+    environment:
+      MEILI_MASTER_KEY: ${MEILISEARCH_MASTER_KEY:-masterKey}
+      MEILI_ENV: ${MEILISEARCH_ENV:-development}
+    ports:
+      - "${MEILISEARCH_PORT:-7700}:7700"
+    volumes:
+      - meilisearch_data_dev:/meili_data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - workspace-network
+
+volumes:
+  postgres_data_dev:
+  redis_data_dev:
+  minio_data_dev:
+  meilisearch_data_dev:
+
+networks:
+  workspace-network:
+    driver: bridge
+

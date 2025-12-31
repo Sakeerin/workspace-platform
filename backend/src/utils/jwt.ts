@@ -1,4 +1,5 @@
-import jwt from 'jsonwebtoken';
+import jwt = require('jsonwebtoken');
+import { SignOptions } from 'jsonwebtoken';
 import { env } from '../config/env';
 
 export interface JWTPayload {
@@ -12,16 +13,27 @@ export interface TokenPair {
 }
 
 export class JWTService {
+  private static validateSecrets() {
+    if (!env.jwt.secret || env.jwt.secret.trim() === '') {
+      throw new Error('JWT_SECRET is not set. Please set it in your .env file.');
+    }
+    if (!env.jwt.refreshSecret || env.jwt.refreshSecret.trim() === '') {
+      throw new Error('JWT_REFRESH_SECRET is not set. Please set it in your .env file.');
+    }
+  }
+
   static generateAccessToken(payload: JWTPayload): string {
-    return jwt.sign(payload, env.jwt.secret, {
+    this.validateSecrets();
+    return jwt.sign(payload, env.jwt.secret as string, {
       expiresIn: env.jwt.expiresIn,
-    });
+    } as SignOptions);
   }
 
   static generateRefreshToken(payload: JWTPayload): string {
-    return jwt.sign(payload, env.jwt.refreshSecret, {
+    this.validateSecrets();
+    return jwt.sign(payload, env.jwt.refreshSecret as string, {
       expiresIn: env.jwt.refreshExpiresIn,
-    });
+    } as SignOptions);
   }
 
   static generateTokenPair(payload: JWTPayload): TokenPair {

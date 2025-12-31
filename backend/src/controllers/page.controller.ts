@@ -160,7 +160,7 @@ export class PageController {
       throw new Error('Favorite not found');
     }
 
-    await this.favoriteRepo.delete(user.id, page.id);
+    await this.favoriteRepo.deleteByUserIdAndPageId(user.id, page.id);
   }
 
   @Get('favorites')

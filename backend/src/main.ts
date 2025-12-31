@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { ErrorHandlerMiddleware } from './middlewares/error-handler.middleware';
+import { BigIntSerializerInterceptor } from './interceptors/bigint-serializer.interceptor';
 import { env } from './config/env';
 import { Server as HTTPServer } from 'http';
 import { setupSocketIO } from './websocket/socket.config';
@@ -28,6 +29,9 @@ async function bootstrap() {
 
   // Error handling
   app.useGlobalFilters(new ErrorHandlerMiddleware());
+
+  // BigInt serialization interceptor
+  app.useGlobalInterceptors(new BigIntSerializerInterceptor());
 
   // API prefix
   app.setGlobalPrefix(`api/${env.apiVersion}`);

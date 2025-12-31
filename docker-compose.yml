@@ -1,28 +1,33 @@
 version: '3.8'
 
 services:
+  # Database
   postgres:
-    image: postgres:16
+    image: postgres:16-alpine
     container_name: workspace-postgres
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: workspace_db
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-workspace_db}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-user}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - workspace-network
 
+  # Cache
   redis:
     image: redis:7-alpine
     container_name: workspace-redis
+    command: redis-server --appendonly yes
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -30,17 +35,20 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - workspace-network
 
+  # File Storage
   minio:
     image: minio/minio:latest
     container_name: workspace-minio
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
     volumes:
       - minio_data:/data
     healthcheck:
@@ -48,15 +56,18 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
+    networks:
+      - workspace-network
 
+  # Search Engine
   meilisearch:
     image: getmeili/meilisearch:latest
     container_name: workspace-meilisearch
     environment:
-      MEILI_MASTER_KEY: masterKey
-      MEILI_ENV: development
+      MEILI_MASTER_KEY: ${MEILISEARCH_MASTER_KEY:-masterKey}
+      MEILI_ENV: ${MEILISEARCH_ENV:-development}
     ports:
-      - "7700:7700"
+      - "${MEILISEARCH_PORT:-7700}:7700"
     volumes:
       - meilisearch_data:/meili_data
     healthcheck:
@@ -64,10 +75,82 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - workspace-network
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: workspace-backend
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-password}@postgres:5432/${POSTGRES_DB:-workspace_db}
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-your-refresh-secret-key-change-in-production}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_BUCKET: ${MINIO_BUCKET:-workspace-files}
+      MEILISEARCH_URL: http://meilisearch:7700
+      MEILISEARCH_MASTER_KEY: ${MEILISEARCH_MASTER_KEY:-masterKey}
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+    ports:
+      - "${BACKEND_PORT:-3000}:3000"
+    volumes:
+      - ./backend/logs:/app/logs
+      - ./backend/prisma:/app/prisma
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+    networks:
+      - workspace-network
+    restart: unless-stopped
+    command: >
+      sh -c "
+        echo 'Waiting for database...' &&
+        sleep 5 &&
+        npx prisma migrate deploy &&
+        npx prisma generate &&
+        node dist/main.js
+      "
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    container_name: workspace-frontend
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api/v1}
+      VITE_WS_URL: ${VITE_WS_URL:-ws://localhost:3000}
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      - backend
+    networks:
+      - workspace-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
   redis_data:
   minio_data:
   meilisearch_data:
+
+networks:
+  workspace-network:
+    driver: bridge
 

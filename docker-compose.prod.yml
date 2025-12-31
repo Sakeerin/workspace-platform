@@ -1,0 +1,164 @@
+version: '3.8'
+
+# Production docker-compose
+# Usage: docker-compose -f docker-compose.prod.yml up -d
+
+services:
+  # Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: workspace-postgres-prod
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-workspace_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - workspace-network
+    restart: always
+    # Uncomment for production backup
+    # command: postgres -c wal_level=replica -c max_wal_senders=3 -c max_replication_slots=3
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: workspace-redis-prod
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data_prod:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - workspace-network
+    restart: always
+
+  # File Storage
+  minio:
+    image: minio/minio:latest
+    container_name: workspace-minio-prod
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data_prod:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - workspace-network
+    restart: always
+
+  # Search Engine
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: workspace-meilisearch-prod
+    environment:
+      MEILI_MASTER_KEY: ${MEILISEARCH_MASTER_KEY}
+      MEILI_ENV: production
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch_data_prod:/meili_data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - workspace-network
+    restart: always
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: production
+    container_name: workspace-backend-prod
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-workspace_db}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      MINIO_ENDPOINT: minio
+      MINIO_PORT: 9000
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET:-workspace-files}
+      MEILISEARCH_URL: http://meilisearch:7700
+      MEILISEARCH_MASTER_KEY: ${MEILISEARCH_MASTER_KEY}
+      APP_URL: ${APP_URL}
+      FRONTEND_URL: ${FRONTEND_URL}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend/logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+    networks:
+      - workspace-network
+    restart: always
+    command: >
+      sh -c "
+        echo 'Waiting for database...' &&
+        sleep 5 &&
+        npx prisma migrate deploy &&
+        npx prisma generate &&
+        node dist/main.js
+      "
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    container_name: workspace-frontend-prod
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
+      VITE_WS_URL: ${VITE_WS_URL}
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - workspace-network
+    restart: always
+
+volumes:
+  postgres_data_prod:
+  redis_data_prod:
+  minio_data_prod:
+  meilisearch_data_prod:
+
+networks:
+  workspace-network:
+    driver: bridge
+

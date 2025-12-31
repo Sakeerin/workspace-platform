@@ -1,9 +1,11 @@
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { WorkspaceRepository } from '../repositories/workspace.repository';
 import { WorkspaceMemberRepository } from '../repositories/workspace-member.repository';
 import { UserRepository } from '../repositories/user.repository';
 import { PermissionService } from './permission.service';
 import { CreateWorkspaceDto, UpdateWorkspaceDto, InviteMemberDto } from '../dto/workspace.dto';
 
+@Injectable()
 export class WorkspaceService {
   constructor(
     private workspaceRepo: WorkspaceRepository,
@@ -14,13 +16,22 @@ export class WorkspaceService {
 
   async createWorkspace(userId: bigint, dto: CreateWorkspaceDto) {
     // Generate slug if not provided
-    const slug = dto.slug || this.generateSlug(dto.name);
+    let slug = dto.slug || this.generateSlug(dto.name);
 
-    // Check if slug is unique
-    const existing = await this.workspaceRepo.findBySlug(slug);
-    if (existing) {
-      throw new Error('Workspace with this slug already exists');
+    // Ensure slug is unique by appending a number if needed
+    let uniqueSlug = slug;
+    let counter = 1;
+    while (await this.workspaceRepo.findBySlug(uniqueSlug)) {
+      uniqueSlug = `${slug}-${counter}`;
+      counter++;
+      // Prevent infinite loop (max 1000 attempts)
+      if (counter > 1000) {
+        // Fallback to UUID-based slug
+        uniqueSlug = `${slug}-${Date.now()}`;
+        break;
+      }
     }
+    slug = uniqueSlug;
 
     // Create workspace
     const workspace = await this.workspaceRepo.create({
@@ -49,7 +60,7 @@ export class WorkspaceService {
 
     const workspace = await this.workspaceRepo.findById(workspaceId);
     if (!workspace) {
-      throw new Error('Workspace not found');
+      throw new NotFoundException('Workspace not found');
     }
 
     return workspace;
@@ -58,12 +69,12 @@ export class WorkspaceService {
   async getWorkspaceByUuid(uuid: string, userUuid: string) {
     const workspace = await this.workspaceRepo.findByUuid(uuid);
     if (!workspace) {
-      throw new Error('Workspace not found');
+      throw new NotFoundException('Workspace not found');
     }
 
     const user = await this.userRepo.findByUuid(userUuid);
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     await this.permissionService.requireWorkspaceAccess(user.id, workspace.id);
@@ -100,7 +111,7 @@ export class WorkspaceService {
     // Find user by email
     const user = await this.userRepo.findByEmail(dto.email);
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     // Check if already member
@@ -109,7 +120,7 @@ export class WorkspaceService {
       user.id
     );
     if (existing) {
-      throw new Error('User is already a member of this workspace');
+      throw new ConflictException('User is already a member of this workspace');
     }
 
     // Create membership

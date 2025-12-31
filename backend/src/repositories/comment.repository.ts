@@ -1,8 +1,10 @@
+import { Injectable } from '@nestjs/common';
 import { PrismaClient, Comment } from '@prisma/client';
 import { BaseRepository } from './base.repository';
 import { CommentCreateInput, CommentUpdateInput } from '../models/comment.model';
 import prisma from '../config/database';
 
+@Injectable()
 export class CommentRepository extends BaseRepository<Comment> {
   constructor() {
     super(prisma);

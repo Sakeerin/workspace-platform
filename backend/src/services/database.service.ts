@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { DatabaseRepository } from '../repositories/database.repository';
 import { DatabaseRowRepository } from '../repositories/database-row.repository';
 import { PageRepository } from '../repositories/page.repository';
@@ -5,6 +6,7 @@ import { WorkspaceRepository } from '../repositories/workspace.repository';
 import { PermissionService } from './permission.service';
 import { CreateDatabaseDto, UpdateDatabaseDto, CreateDatabaseRowDto, UpdateDatabaseRowDto } from '../dto/database.dto';
 
+@Injectable()
 export class DatabaseService {
   constructor(
     private databaseRepo: DatabaseRepository,
@@ -207,8 +209,9 @@ export class DatabaseService {
     }
 
     // Calculate formula properties if needed
+    const rowProps = row.properties as Record<string, any> || {};
     const processedProperties = dto.properties
-      ? await this.processFormulaProperties(database, { ...row.properties, ...dto.properties })
+      ? await this.processFormulaProperties(database, { ...rowProps, ...dto.properties })
       : undefined;
 
     return this.databaseRowRepo.updateByUuid(rowUuid, {
@@ -388,7 +391,7 @@ export class DatabaseService {
         const num = parseFloat(arg.trim());
         return isNaN(num) ? 0 : num;
       });
-      return String(values.reduce((sum, val) => sum + val, 0));
+      return String(values.reduce((sum: number, val: number) => sum + val, 0));
     });
 
     // AVG({prop1}, {prop2}, ...)

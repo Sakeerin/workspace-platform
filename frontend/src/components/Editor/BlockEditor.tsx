@@ -73,8 +73,66 @@ export default function BlockEditor({
 
   const sortedBlocks = [...blocks].sort((a, b) => a.position - b.position);
 
+  // Keyboard navigation handlers
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent, blockIndex: number) => {
+      // Arrow Up: Focus previous block
+      if (e.key === 'ArrowUp' && e.ctrlKey) {
+        e.preventDefault();
+        if (blockIndex > 0) {
+          const prevBlock = sortedBlocks[blockIndex - 1];
+          const element = document.querySelector(`[data-block-uuid="${prevBlock.uuid}"]`);
+          (element as HTMLElement)?.focus();
+        }
+        return;
+      }
+
+      // Arrow Down: Focus next block
+      if (e.key === 'ArrowDown' && e.ctrlKey) {
+        e.preventDefault();
+        if (blockIndex < sortedBlocks.length - 1) {
+          const nextBlock = sortedBlocks[blockIndex + 1];
+          const element = document.querySelector(`[data-block-uuid="${nextBlock.uuid}"]`);
+          (element as HTMLElement)?.focus();
+        }
+        return;
+      }
+
+      // Enter: Create new block below
+      if (e.key === 'Enter' && e.shiftKey === false) {
+        e.preventDefault();
+        if (onBlockCreate) {
+          onBlockCreate('paragraph', blockIndex + 1);
+        }
+        return;
+      }
+
+      // Backspace at start: Delete block or merge with previous
+      if (e.key === 'Backspace' && blockIndex > 0) {
+        const target = e.target as HTMLElement;
+        const selection = window.getSelection();
+        if (selection?.isCollapsed && selection.anchorOffset === 0) {
+          e.preventDefault();
+          if (onBlockDelete) {
+            onBlockDelete(block.uuid);
+          }
+        }
+      }
+
+      // Slash command
+      handleSlashCommand(e, blockIndex);
+    },
+    [sortedBlocks, onBlockCreate, onBlockDelete, handleSlashCommand]
+  );
+
   return (
-    <div className="relative">
+    <div 
+      className="relative"
+      role="textbox"
+      aria-label="Page editor"
+      aria-multiline="true"
+      tabIndex={0}
+    >
       {sortedBlocks.length === 0 ? (
         <div
           className="text-gray-400 cursor-text mb-4"
@@ -85,6 +143,8 @@ export default function BlockEditor({
             }
           }}
           tabIndex={0}
+          role="button"
+          aria-label="Empty page. Type '/' for commands or start typing"
         >
           Type '/' for commands or start typing...
         </div>
@@ -93,16 +153,11 @@ export default function BlockEditor({
           <div
             key={block.uuid}
             className="block-wrapper"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && e.shiftKey === false) {
-                e.preventDefault();
-                if (onBlockCreate) {
-                  onBlockCreate('paragraph', block.position + 1);
-                }
-              } else {
-                handleSlashCommand(e, index);
-              }
-            }}
+            data-block-uuid={block.uuid}
+            onKeyDown={(e) => handleKeyDown(e, index)}
+            role="textbox"
+            aria-label={`Block ${index + 1} of ${sortedBlocks.length}`}
+            tabIndex={0}
           >
             <BlockRenderer
               block={block}

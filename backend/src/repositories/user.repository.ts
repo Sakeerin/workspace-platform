@@ -1,8 +1,10 @@
+import { Injectable } from '@nestjs/common';
 import { PrismaClient, User } from '@prisma/client';
 import { BaseRepository } from './base.repository';
 import { UserCreateInput, UserUpdateInput } from '../models/user.model';
 import prisma from '../config/database';
 
+@Injectable()
 export class UserRepository extends BaseRepository<User> {
   constructor() {
     super(prisma);

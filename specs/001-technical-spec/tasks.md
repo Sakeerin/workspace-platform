@@ -243,7 +243,7 @@
 - [x] T139 [P] [US4] Create integration test for database creation in backend/tests/integration/database/create.test.ts
 - [x] T140 [P] [US4] Create integration test for database row operations in backend/tests/integration/database/rows.test.ts
 - [x] T141 [P] [US4] Create contract test for POST /api/v1/databases/:uuid/rows in backend/tests/contract/database/rows.contract.test.ts
-- [ ] T142 [P] [US4] Create E2E test for database creation flow in frontend/tests/e2e/database/create.spec.ts
+- [x] T142 [P] [US4] Create E2E test for database creation flow in frontend/tests/e2e/database/create.spec.ts
 
 ### Implementation for User Story 4
 
@@ -355,7 +355,7 @@
 - [ ] T203 [P] Add code comments and JSDoc to all components in frontend/src/components/ (Partially complete - key components done)
 - [x] T204 [P] Performance optimization: Add Redis caching layer in backend/src/services/cache.service.ts
 - [x] T205 [P] Performance optimization: Implement lazy loading for routes in frontend/src/router/index.tsx
-- [x] T206 [P] Performance optimization: Add virtual scrolling for large block lists in frontend/src/components/Editor/BlockList.tsx (Note: Requires @tanstack/react-virtual package)
+- [x] T206 [P] Performance optimization: Add virtual scrolling for large block lists in frontend/src/components/Editor/BlockList.tsx
 - [x] T207 [P] Security: Add input sanitization in backend/src/middlewares/sanitize.middleware.ts (Note: Requires isomorphic-dompurify package)
 - [x] T208 [P] Security: Add CSRF protection in backend/src/middlewares/csrf.middleware.ts
 - [x] T209 [P] Security: Implement rate limiting per endpoint in backend/src/middlewares/rate-limit.middleware.ts (enhance T026)
@@ -366,7 +366,7 @@
 - [ ] T214 [P] Testing: Increase test coverage to > 80% across all modules (Requires running test suite)
 - [x] T215 [P] Monitoring: Setup application logging in backend/src/utils/logger.ts (enhance T027)
 - [x] T216 [P] Monitoring: Add performance monitoring in backend/src/middlewares/performance.middleware.ts
-- [ ] T217 [P] Documentation: Create architecture diagrams in docs/architecture/ (Can be created manually or with diagram tools)
+- [x] T217 [P] Documentation: Create architecture diagrams in docs/architecture/ (Can be created manually or with diagram tools)
 - [x] T218 [P] Documentation: Create deployment guide in docs/deployment.md
 - [ ] T219 Run quickstart.md validation - verify all setup steps work (Requires manual testing)
 - [ ] T220 Code cleanup and refactoring - remove unused code, optimize imports (Ongoing task)

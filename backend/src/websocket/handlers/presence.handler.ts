@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { RoomManager } from '../room.manager';
 import { YjsSetup } from '../crdt/yjs-setup';
+import { PageAccessGuard, canAccessPage, emitPageAccessDenied } from '../page-access.guard';
 
 export interface PresenceData {
   user_id: string;
@@ -25,7 +26,11 @@ export class PresenceHandler {
   private roomManager: RoomManager;
   private presence = new Map<string, Map<string, PresenceData>>(); // pageUuid -> userId -> presence
 
-  constructor(server: Server, roomManager: RoomManager) {
+  constructor(
+    server: Server,
+    roomManager: RoomManager,
+    private pageAccessGuard: PageAccessGuard
+  ) {
     this.server = server;
     this.roomManager = roomManager;
   }
@@ -42,6 +47,11 @@ export class PresenceHandler {
     const userId = client.data.user.userId;
     const userName = client.data.user.name || client.data.user.email;
     const userEmail = client.data.user.email;
+
+    if (!(await canAccessPage(client, page_id, this.pageAccessGuard))) {
+      emitPageAccessDenied(client, page_id);
+      return;
+    }
 
     // Join room
     await this.roomManager.joinPageRoom(client, page_id);
@@ -93,6 +103,11 @@ export class PresenceHandler {
     const { page_id } = data;
     const userId = client.data.user.userId;
 
+    if (!(await canAccessPage(client, page_id, this.pageAccessGuard))) {
+      emitPageAccessDenied(client, page_id);
+      return;
+    }
+
     // Leave room
     await this.roomManager.leavePageRoom(client, page_id);
 
@@ -122,7 +137,7 @@ export class PresenceHandler {
   /**
    * Handle cursor position update
    */
-  handleCursorUpdate(client: Socket, data: { page_id: string; cursor: any }) {
+  async handleCursorUpdate(client: Socket, data: { page_id: string; cursor: any }) {
     if (!client.data.user) {
       return;
     }
@@ -130,12 +145,19 @@ export class PresenceHandler {
     const { page_id, cursor } = data;
     const userId = client.data.user.userId;
 
-    // Update presence with cursor
-    if (this.presence.has(page_id) && this.presence.get(page_id)!.has(userId)) {
-      const presenceData = this.presence.get(page_id)!.get(userId)!;
-      presenceData.cursor = cursor;
-      presenceData.last_seen = new Date().toISOString();
+    if (!(await canAccessPage(client, page_id, this.pageAccessGuard))) {
+      emitPageAccessDenied(client, page_id);
+      return;
     }
+
+    if (!this.presence.has(page_id) || !this.presence.get(page_id)!.has(userId)) {
+      return;
+    }
+
+    // Update presence with cursor
+    const presenceData = this.presence.get(page_id)!.get(userId)!;
+    presenceData.cursor = cursor;
+    presenceData.last_seen = new Date().toISOString();
 
     // Update Yjs presence map
     const presenceMap = YjsSetup.getPresenceMap(page_id);

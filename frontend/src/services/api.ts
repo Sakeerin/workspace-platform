@@ -1,8 +1,51 @@
 import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
 import { env } from '../config/env';
 
+interface TokenPair {
+  accessToken: string;
+  refreshToken: string;
+}
+
+interface RetryableRequestConfig extends AxiosRequestConfig {
+  _retry?: boolean;
+}
+
+function clearStoredAuth() {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  localStorage.removeItem('auth-storage');
+}
+
+function persistTokens(tokens: TokenPair) {
+  localStorage.setItem('access_token', tokens.accessToken);
+  localStorage.setItem('refresh_token', tokens.refreshToken);
+
+  const storedAuth = localStorage.getItem('auth-storage');
+  if (!storedAuth) {
+    return;
+  }
+
+  try {
+    const parsed = JSON.parse(storedAuth);
+    localStorage.setItem(
+      'auth-storage',
+      JSON.stringify({
+        ...parsed,
+        state: {
+          ...parsed.state,
+          accessToken: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+        },
+      })
+    );
+  } catch {
+    localStorage.removeItem('auth-storage');
+  }
+}
+
 class ApiService {
   private client: AxiosInstance;
+  private refreshPromise: Promise<TokenPair> | null = null;
 
   constructor() {
     this.client = axios.create({
@@ -30,16 +73,35 @@ class ApiService {
     // Response interceptor for error handling
     this.client.interceptors.response.use(
       (response) => response,
-      (error: AxiosError<any>) => {
+      async (error: AxiosError<any>) => {
         const status = error.response?.status;
         const errorData = error.response?.data;
+        const originalRequest = error.config as RetryableRequestConfig | undefined;
 
         // Handle specific HTTP status codes
         switch (status) {
           case 401:
-            // Unauthorized - clear tokens and redirect to login
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
+            if (
+              originalRequest &&
+              !originalRequest._retry &&
+              !originalRequest.url?.includes('/auth/refresh') &&
+              this.hasRefreshToken()
+            ) {
+              originalRequest._retry = true;
+
+              try {
+                const tokens = await this.refreshTokens();
+                originalRequest.headers = {
+                  ...originalRequest.headers,
+                  Authorization: `Bearer ${tokens.accessToken}`,
+                };
+                return this.client(originalRequest);
+              } catch {
+                // Fall through to clear auth and redirect below.
+              }
+            }
+
+            clearStoredAuth();
             if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
               window.location.href = '/login';
             }
@@ -106,7 +168,7 @@ class ApiService {
         }
 
         // Log error for debugging (in development)
-        if (process.env.NODE_ENV === 'development') {
+        if (import.meta.env.DEV) {
           console.error('API Error:', {
             status,
             message: error.message,
@@ -144,6 +206,41 @@ class ApiService {
   async delete<T>(url: string, config?: AxiosRequestConfig) {
     const response = await this.client.delete<T>(url, config);
     return response.data;
+  }
+
+  private hasRefreshToken() {
+    return Boolean(localStorage.getItem('refresh_token'));
+  }
+
+  private async refreshTokens(): Promise<TokenPair> {
+    if (!this.refreshPromise) {
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (!refreshToken) {
+        return Promise.reject(new Error('No refresh token available'));
+      }
+
+      this.refreshPromise = axios
+        .post<{ success: boolean; data: { tokens: TokenPair } }>(
+          `${env.apiUrl}/auth/refresh`,
+          { refreshToken },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            timeout: 30000,
+          }
+        )
+        .then((response) => {
+          const { tokens } = response.data.data;
+          persistTokens(tokens);
+          return tokens;
+        })
+        .finally(() => {
+          this.refreshPromise = null;
+        });
+    }
+
+    return this.refreshPromise;
   }
 }
 

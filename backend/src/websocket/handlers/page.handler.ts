@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { RoomManager } from '../room.manager';
+import { PageAccessGuard, canAccessPage, emitPageAccessDenied } from '../page-access.guard';
 
 /**
  * Page Handler
@@ -10,7 +11,11 @@ export class PageHandler {
   private server: Server;
   private roomManager: RoomManager;
 
-  constructor(server: Server, roomManager: RoomManager) {
+  constructor(
+    server: Server,
+    roomManager: RoomManager,
+    private pageAccessGuard: PageAccessGuard
+  ) {
     this.server = server;
     this.roomManager = roomManager;
   }
@@ -18,13 +23,18 @@ export class PageHandler {
   /**
    * Handle page update from client
    */
-  handlePageUpdate(client: Socket, data: { page_id: string; page: any }) {
+  async handlePageUpdate(client: Socket, data: { page_id: string; page: any }) {
     if (!client.data.user) {
       return;
     }
 
     const { page_id, page } = data;
     const userId = client.data.user.userId;
+
+    if (!(await canAccessPage(client, page_id, this.pageAccessGuard))) {
+      emitPageAccessDenied(client, page_id);
+      return;
+    }
 
     // Broadcast to other clients (excluding sender)
     client.to(`page:${page_id}`).emit('page_updated', {

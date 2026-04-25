@@ -30,10 +30,6 @@ tags:
     description: File upload and management
   - name: Search
     description: Search functionality
-  - name: Notifications
-    description: User notifications
-  - name: Activity
-    description: Activity logs
 
 paths:
   # Authentication
@@ -93,6 +89,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/refresh:
+    post:
+      tags: [Authentication]
+      summary: Refresh access and refresh tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refreshToken]
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        '200':
+          description: Tokens refreshed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefreshResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
 
@@ -456,13 +476,14 @@ paths:
           description: Block deleted
 
   # Favorites
-  /pages/{pageUuid}/favorite:
+  /workspaces/{workspaceUuid}/pages/{pageUuid}/favorite:
     post:
       tags: [Pages]
       summary: Add page to favorites
       security:
         - bearerAuth: []
       parameters:
+        - $ref: '#/components/parameters/WorkspaceUuid'
         - $ref: '#/components/parameters/PageUuid'
       responses:
         '201':
@@ -494,6 +515,7 @@ paths:
       security:
         - bearerAuth: []
       parameters:
+        - $ref: '#/components/parameters/WorkspaceUuid'
         - $ref: '#/components/parameters/PageUuid'
       responses:
         '204':
@@ -501,12 +523,14 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
-  /pages/favorites:
+  /workspaces/{workspaceUuid}/pages/favorites:
     get:
       tags: [Pages]
       summary: List favorite pages
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/WorkspaceUuid'
       responses:
         '200':
           description: List of favorite pages
@@ -521,6 +545,172 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Page'
+
+  # Databases
+  /databases:
+    post:
+      tags: [Databases]
+      summary: Create database for a page
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDatabaseRequest'
+      responses:
+        '201':
+          description: Database created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Database'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /databases/{databaseUuid}:
+    get:
+      tags: [Databases]
+      summary: Get database
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DatabaseUuid'
+      responses:
+        '200':
+          description: Database details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Database'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Databases]
+      summary: Update database
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DatabaseUuid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDatabaseRequest'
+      responses:
+        '200':
+          description: Database updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Database'
+
+    delete:
+      tags: [Databases]
+      summary: Delete database
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DatabaseUuid'
+      responses:
+        '204':
+          description: Database deleted
+
+  /databases/{databaseUuid}/rows:
+    get:
+      tags: [Databases]
+      summary: List database rows
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DatabaseUuid'
+      responses:
+        '200':
+          description: List of database rows
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DatabaseRow'
+
+    post:
+      tags: [Databases]
+      summary: Create database row
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DatabaseUuid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDatabaseRowRequest'
+      responses:
+        '201':
+          description: Database row created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseRow'
+
+  /databases/{databaseUuid}/rows/{rowUuid}:
+    get:
+      tags: [Databases]
+      summary: Get database row
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DatabaseUuid'
+        - $ref: '#/components/parameters/RowUuid'
+      responses:
+        '200':
+          description: Database row details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseRow'
+
+    put:
+      tags: [Databases]
+      summary: Update database row
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DatabaseUuid'
+        - $ref: '#/components/parameters/RowUuid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDatabaseRowRequest'
+      responses:
+        '200':
+          description: Database row updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatabaseRow'
+
+    delete:
+      tags: [Databases]
+      summary: Delete database row
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DatabaseUuid'
+        - $ref: '#/components/parameters/RowUuid'
+      responses:
+        '200':
+          description: Database row deleted
 
   # Comments
   /pages/{pageUuid}/comments:
@@ -607,33 +797,6 @@ paths:
                     items:
                       $ref: '#/components/schemas/SearchResult'
 
-  # Notifications
-  /notifications:
-    get:
-      tags: [Notifications]
-      summary: List user notifications
-      security:
-        - bearerAuth: []
-      parameters:
-        - name: is_read
-          in: query
-          schema:
-            type: boolean
-        - $ref: '#/components/parameters/PageParam'
-        - $ref: '#/components/parameters/LimitParam'
-      responses:
-        '200':
-          description: List of notifications
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Notification'
-
 components:
   securitySchemes:
     bearerAuth:
@@ -652,6 +815,22 @@ components:
 
     PageUuid:
       name: pageUuid
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    DatabaseUuid:
+      name: databaseUuid
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    RowUuid:
+      name: rowUuid
       in: path
       required: true
       schema:
@@ -795,6 +974,123 @@ components:
           type: string
           format: date-time
 
+    Database:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        page_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        properties:
+          type: object
+        views:
+          type: array
+          items:
+            type: object
+        default_view_id:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    DatabaseRow:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        database_id:
+          type: string
+          format: uuid
+        page_id:
+          type: string
+          format: uuid
+          nullable: true
+        properties:
+          type: object
+        properties_text:
+          type: string
+          nullable: true
+        position:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    CreateDatabaseRequest:
+      type: object
+      required: [page_id]
+      properties:
+        page_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        properties:
+          type: object
+        views:
+          type: array
+          items:
+            type: object
+        default_view_id:
+          type: string
+
+    UpdateDatabaseRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        properties:
+          type: object
+        views:
+          type: array
+          items:
+            type: object
+        default_view_id:
+          type: string
+
+    CreateDatabaseRowRequest:
+      type: object
+      required: [properties]
+      properties:
+        properties:
+          type: object
+        page_id:
+          type: string
+          format: uuid
+        properties_text:
+          type: string
+        position:
+          type: integer
+
+    UpdateDatabaseRowRequest:
+      type: object
+      properties:
+        properties:
+          type: object
+        properties_text:
+          type: string
+        position:
+          type: integer
+
     SearchResult:
       type: object
       properties:
@@ -827,52 +1123,36 @@ components:
           type: string
           format: date-time
 
-    Notification:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-        type:
-          type: string
-        title:
-          type: string
-        message:
-          type: string
-        is_read:
-          type: boolean
-        page_id:
-          type: string
-          format: uuid
-          nullable: true
-        created_at:
-          type: string
-          format: date-time
-
-    SearchResult:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-        type:
-          type: string
-        title:
-          type: string
-        snippet:
-          type: string
-        page_id:
-          type: string
-          format: uuid
-
     AuthResponse:
       type: object
       properties:
-        user:
-          $ref: '#/components/schemas/User'
-        access_token:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
+            tokens:
+              $ref: '#/components/schemas/TokenPair'
+
+    TokenRefreshResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        data:
+          type: object
+          properties:
+            tokens:
+              $ref: '#/components/schemas/TokenPair'
+
+    TokenPair:
+      type: object
+      properties:
+        accessToken:
           type: string
-        refresh_token:
+        refreshToken:
           type: string
 
     Pagination:

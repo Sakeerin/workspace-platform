@@ -6,6 +6,7 @@ import { PageController } from './controllers/page.controller';
 import { BlockController } from './controllers/block.controller';
 import { DatabaseController } from './controllers/database.controller';
 import { CommentController } from './controllers/comment.controller';
+import { HealthController } from './controllers/health.controller';
 import { AuthService } from './services/auth.service';
 import { WorkspaceService } from './services/workspace.service';
 import { PageService } from './services/page.service';
@@ -32,7 +33,16 @@ import { SearchService } from './services/search.service';
       isGlobal: true,
     }),
   ],
-  controllers: [AuthController, WorkspaceController, PageController, BlockController, DatabaseController, CommentController, SearchController],
+  controllers: [
+    AuthController,
+    WorkspaceController,
+    PageController,
+    BlockController,
+    DatabaseController,
+    CommentController,
+    SearchController,
+    HealthController,
+  ],
   providers: [
     AuthService,
     WorkspaceService,

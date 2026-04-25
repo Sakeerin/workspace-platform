@@ -87,7 +87,9 @@ export default function QuickSearch({ isOpen, onClose, workspaceUuid }: QuickSea
   };
 
   const handleSelectResult = (result: SearchResult) => {
-    if (result.type === 'page' || result.type === 'database') {
+    if (result.type === 'database') {
+      navigate(`/workspaces/${effectiveWorkspaceUuid}/databases/${result.uuid}`);
+    } else if (result.type === 'page') {
       navigate(`/workspaces/${effectiveWorkspaceUuid}/pages/${result.uuid}`);
     } else if (result.page_id) {
       navigate(`/workspaces/${effectiveWorkspaceUuid}/pages/${result.page_id}`);

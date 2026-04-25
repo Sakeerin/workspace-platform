@@ -20,6 +20,7 @@
     "@lexical/markdown": "^0.14.0",
     "@lexical/react": "^0.14.0",
     "@lexical/rich-text": "^0.14.0",
+    "@tanstack/react-virtual": "^3.13.24",
     "axios": "^1.6.2",
     "clsx": "^2.1.0",
     "date-fns": "^3.0.6",

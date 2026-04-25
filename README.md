@@ -127,9 +127,13 @@ npm run start:dev      # Start development server with hot reload
 npm run build          # Build for production
 npm run start:prod     # Start production server
 npm run test           # Run unit tests
+npm run test:list      # List discovered backend tests
+npm run test:unit      # Run backend unit test suite
 npm run test:integration # Run integration tests
-npm run test:e2e       # Run E2E tests
+npm run test:contract  # Run contract tests
+npm run test:e2e       # Alias for backend integration tests until dedicated E2E exists
 npm run lint           # Lint code with ESLint
+npm run lint:fix       # Lint and auto-fix code
 npm run format         # Format code with Prettier
 npm run prisma:studio  # Open Prisma Studio
 ```
@@ -189,9 +193,12 @@ workspace-platform/
 ```bash
 # Backend tests
 cd backend
-npm run test              # Unit tests
+npm run test              # All backend Jest tests
+npm run test:list         # List discovered backend tests
+npm run test:unit         # Unit tests
 npm run test:integration  # Integration tests
-npm run test:e2e          # E2E tests
+npm run test:contract     # Contract tests
+npm run test:e2e          # Alias for integration tests
 
 # Frontend tests
 cd frontend

@@ -12,14 +12,6 @@ export class WebSocketGateway {
     this.server.on('connection', (client: Socket) => {
       this.handleConnection(client);
 
-      client.on('join_page', (data: { page_id: string }) => {
-        this.handleJoinPage(client, data);
-      });
-
-      client.on('leave_page', (data: { page_id: string }) => {
-        this.handleLeavePage(client, data);
-      });
-
       client.on('disconnect', () => {
         this.handleDisconnect(client);
       });
@@ -48,18 +40,6 @@ export class WebSocketGateway {
     if (client.data.user) {
       this.connectedUsers.delete(client.data.user.userId);
     }
-  }
-
-  private handleJoinPage(client: Socket, data: { page_id: string }) {
-    if (!client.data.user) {
-      return;
-    }
-
-    client.join(`page:${data.page_id}`);
-  }
-
-  private handleLeavePage(client: Socket, data: { page_id: string }) {
-    client.leave(`page:${data.page_id}`);
   }
 
   broadcastToPage(pageId: string, event: string, data: any) {

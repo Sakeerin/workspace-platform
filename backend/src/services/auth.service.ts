@@ -1,10 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import { WorkspaceRepository } from '../repositories/workspace.repository';
 import { WorkspaceMemberRepository } from '../repositories/workspace-member.repository';
 import { EncryptionService } from '../utils/encryption';
 import { JWTService, TokenPair } from '../utils/jwt';
-import { RegisterDto, LoginDto } from '../dto/auth.dto';
+import { RegisterDto, LoginDto, RefreshTokenDto } from '../dto/auth.dto';
 
 /**
  * Authentication Service
@@ -46,7 +51,7 @@ export class AuthService {
     // Check if user already exists
     const existingUser = await this.userRepo.findByEmail(dto.email);
     if (existingUser) {
-      throw new Error('User with this email already exists');
+      throw new ConflictException('User with this email already exists');
     }
 
     // Hash password
@@ -110,7 +115,7 @@ export class AuthService {
     // Find user
     const user = await this.userRepo.findByEmail(dto.email);
     if (!user || !user.isActive) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     // Verify password
@@ -119,7 +124,7 @@ export class AuthService {
       user.passwordHash
     );
     if (!isValid) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     // Update last login
@@ -147,7 +152,7 @@ export class AuthService {
   async getCurrentUser(userId: string): Promise<any> {
     const user = await this.userRepo.findByUuid(userId);
     if (!user || !user.isActive) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     return {
@@ -157,6 +162,28 @@ export class AuthService {
       avatarUrl: user.avatarUrl,
       timezone: user.timezone,
       locale: user.locale,
+    };
+  }
+
+  async refresh(dto: RefreshTokenDto): Promise<{ tokens: TokenPair }> {
+    let payload: { userId: string; email: string };
+
+    try {
+      payload = JWTService.verifyRefreshToken(dto.refreshToken);
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    const user = await this.userRepo.findByUuid(payload.userId);
+    if (!user || !user.isActive || user.email !== payload.email) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    return {
+      tokens: JWTService.generateTokenPair({
+        userId: user.uuid,
+        email: user.email,
+      }),
     };
   }
 

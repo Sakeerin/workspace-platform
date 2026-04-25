@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PageRepository } from '../repositories/page.repository';
 import { BlockRepository } from '../repositories/block.repository';
+import { WorkspaceRepository } from '../repositories/workspace.repository';
 import { PermissionService } from './permission.service';
 import { getMeilisearchClient } from '../config/search';
 
@@ -27,20 +28,17 @@ export class SearchService {
   constructor(
     private pageRepo: PageRepository,
     private blockRepo: BlockRepository,
+    private workspaceRepo: WorkspaceRepository,
     private permissionService: PermissionService
   ) {}
 
   async search(workspaceUuid: string, userId: bigint, query: string, options: SearchOptions = {}) {
-    // Verify workspace access
-    const workspace = await this.pageRepo.findByWorkspaceId(
-      (await this.pageRepo.findByUuid(workspaceUuid))?.workspaceId || BigInt(0)
-    );
-    
-    if (!workspace || workspace.length === 0) {
+    const workspace = await this.workspaceRepo.findByUuid(workspaceUuid);
+    if (!workspace) {
       throw new Error('Workspace not found');
     }
 
-    const workspaceId = workspace[0].workspaceId;
+    const workspaceId = workspace.id;
     await this.permissionService.requireWorkspaceAccess(userId, workspaceId);
 
     const client = getMeilisearchClient();

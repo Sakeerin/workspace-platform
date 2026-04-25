@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { RoomManager } from '../room.manager';
 import { YjsSetup } from '../crdt/yjs-setup';
+import { PageAccessGuard, canAccessPage, emitPageAccessDenied } from '../page-access.guard';
 
 /**
  * Block Handler
@@ -12,7 +13,11 @@ export class BlockHandler {
   private server: Server;
   private roomManager: RoomManager;
 
-  constructor(server: Server, roomManager: RoomManager) {
+  constructor(
+    server: Server,
+    roomManager: RoomManager,
+    private pageAccessGuard: PageAccessGuard
+  ) {
     this.server = server;
     this.roomManager = roomManager;
   }
@@ -20,13 +25,18 @@ export class BlockHandler {
   /**
    * Handle block update from client
    */
-  handleBlockUpdate(client: Socket, data: { page_id: string; block: any }) {
+  async handleBlockUpdate(client: Socket, data: { page_id: string; block: any }) {
     if (!client.data.user) {
       return;
     }
 
     const { page_id, block } = data;
     const userId = client.data.user.userId;
+
+    if (!(await canAccessPage(client, page_id, this.pageAccessGuard))) {
+      emitPageAccessDenied(client, page_id);
+      return;
+    }
 
     // Update Yjs document
     const blocksMap = YjsSetup.getBlocksMap(page_id);
@@ -51,13 +61,18 @@ export class BlockHandler {
   /**
    * Handle block creation from client
    */
-  handleBlockCreate(client: Socket, data: { page_id: string; block: any }) {
+  async handleBlockCreate(client: Socket, data: { page_id: string; block: any }) {
     if (!client.data.user) {
       return;
     }
 
     const { page_id, block } = data;
     const userId = client.data.user.userId;
+
+    if (!(await canAccessPage(client, page_id, this.pageAccessGuard))) {
+      emitPageAccessDenied(client, page_id);
+      return;
+    }
 
     // Add to Yjs document
     const blocksMap = YjsSetup.getBlocksMap(page_id);
@@ -86,13 +101,18 @@ export class BlockHandler {
   /**
    * Handle block deletion from client
    */
-  handleBlockDelete(client: Socket, data: { page_id: string; block_uuid: string }) {
+  async handleBlockDelete(client: Socket, data: { page_id: string; block_uuid: string }) {
     if (!client.data.user) {
       return;
     }
 
     const { page_id, block_uuid } = data;
     const userId = client.data.user.userId;
+
+    if (!(await canAccessPage(client, page_id, this.pageAccessGuard))) {
+      emitPageAccessDenied(client, page_id);
+      return;
+    }
 
     // Remove from Yjs document
     const blocksMap = YjsSetup.getBlocksMap(page_id);

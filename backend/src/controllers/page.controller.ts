@@ -61,6 +61,31 @@ export class PageController {
     };
   }
 
+  @Get('favorites')
+  async getFavorites(@Request() req: any) {
+    const userUuid = req.user.userId;
+    const user = await this.userRepo.findByUuid(userUuid);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const favorites = await this.favoriteRepo.findByUserId(user.id);
+    const pages = favorites.map((fav) => ({
+      uuid: fav.page.uuid,
+      title: fav.page.title,
+      icon: fav.page.icon,
+      type: fav.page.type,
+      visibility: fav.page.visibility,
+      updated_at: fav.page.updatedAt,
+      favorited_at: fav.createdAt,
+    }));
+
+    return {
+      success: true,
+      data: pages,
+    };
+  }
+
   @Get(':pageUuid')
   async getPage(@Param('pageUuid') pageUuid: string, @Request() req: any) {
     const userUuid = req.user.userId;
@@ -161,31 +186,6 @@ export class PageController {
     }
 
     await this.favoriteRepo.deleteByUserIdAndPageId(user.id, page.id);
-  }
-
-  @Get('favorites')
-  async getFavorites(@Request() req: any) {
-    const userUuid = req.user.userId;
-    const user = await this.userRepo.findByUuid(userUuid);
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    const favorites = await this.favoriteRepo.findByUserId(user.id);
-    const pages = favorites.map((fav) => ({
-      uuid: fav.page.uuid,
-      title: fav.page.title,
-      icon: fav.page.icon,
-      type: fav.page.type,
-      visibility: fav.page.visibility,
-      updated_at: fav.page.updatedAt,
-      favorited_at: fav.createdAt,
-    }));
-
-    return {
-      success: true,
-      data: pages,
-    };
   }
 }
 

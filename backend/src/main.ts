@@ -8,6 +8,9 @@ import { Server as HTTPServer } from 'http';
 import { setupSocketIO } from './websocket/socket.config';
 import { WebSocketService } from './services/websocket.service';
 import { BlockService } from './services/block.service';
+import { PageRepository } from './repositories/page.repository';
+import { UserRepository } from './repositories/user.repository';
+import { PermissionService } from './services/permission.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -39,7 +42,12 @@ async function bootstrap() {
   // Setup WebSocket
   const httpServer: HTTPServer = app.getHttpServer() as HTTPServer;
   const ioServer = setupSocketIO(httpServer);
-  const websocketService = new WebSocketService(ioServer);
+  const websocketService = new WebSocketService(
+    ioServer,
+    app.get(PageRepository),
+    app.get(UserRepository),
+    app.get(PermissionService)
+  );
 
   // Integrate WebSocket with BlockService
   const blockService = app.get(BlockService);

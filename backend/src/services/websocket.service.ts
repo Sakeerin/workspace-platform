@@ -4,6 +4,9 @@ import { RoomManager } from '../websocket/room.manager';
 import { PresenceHandler } from '../websocket/handlers/presence.handler';
 import { BlockHandler } from '../websocket/handlers/block.handler';
 import { PageHandler } from '../websocket/handlers/page.handler';
+import { PageRepository } from '../repositories/page.repository';
+import { UserRepository } from '../repositories/user.repository';
+import { PermissionService } from './permission.service';
 
 /**
  * WebSocket Service
@@ -21,12 +24,18 @@ export class WebSocketService {
   private blockHandler: BlockHandler;
   private pageHandler: PageHandler;
 
-  constructor(server: Server) {
+  constructor(
+    server: Server,
+    private pageRepo: PageRepository,
+    private userRepo: UserRepository,
+    private permissionService: PermissionService
+  ) {
     this.gateway = new WebSocketGateway(server);
     this.roomManager = new RoomManager(server);
-    this.presenceHandler = new PresenceHandler(server, this.roomManager);
-    this.blockHandler = new BlockHandler(server, this.roomManager);
-    this.pageHandler = new PageHandler(server, this.roomManager);
+    const pageAccessGuard = this.canAccessPage.bind(this);
+    this.presenceHandler = new PresenceHandler(server, this.roomManager, pageAccessGuard);
+    this.blockHandler = new BlockHandler(server, this.roomManager, pageAccessGuard);
+    this.pageHandler = new PageHandler(server, this.roomManager, pageAccessGuard);
 
     this.setupEventHandlers(server);
   }
@@ -37,34 +46,34 @@ export class WebSocketService {
   private setupEventHandlers(server: Server) {
     server.on('connection', (client: Socket) => {
       // Handle presence events
-      client.on('join_page', (data: { page_id: string }) => {
-        this.presenceHandler.handleJoinPage(client, data);
+      client.on('join_page', async (data: { page_id: string }) => {
+        await this.presenceHandler.handleJoinPage(client, data);
       });
 
-      client.on('leave_page', (data: { page_id: string }) => {
-        this.presenceHandler.handleLeavePage(client, data);
+      client.on('leave_page', async (data: { page_id: string }) => {
+        await this.presenceHandler.handleLeavePage(client, data);
       });
 
-      client.on('cursor_update', (data: { page_id: string; cursor: any }) => {
-        this.presenceHandler.handleCursorUpdate(client, data);
+      client.on('cursor_update', async (data: { page_id: string; cursor: any }) => {
+        await this.presenceHandler.handleCursorUpdate(client, data);
       });
 
       // Handle block events
-      client.on('block_update', (data: { page_id: string; block: any }) => {
-        this.blockHandler.handleBlockUpdate(client, data);
+      client.on('block_update', async (data: { page_id: string; block: any }) => {
+        await this.blockHandler.handleBlockUpdate(client, data);
       });
 
-      client.on('block_create', (data: { page_id: string; block: any }) => {
-        this.blockHandler.handleBlockCreate(client, data);
+      client.on('block_create', async (data: { page_id: string; block: any }) => {
+        await this.blockHandler.handleBlockCreate(client, data);
       });
 
-      client.on('block_delete', (data: { page_id: string; block_uuid: string }) => {
-        this.blockHandler.handleBlockDelete(client, data);
+      client.on('block_delete', async (data: { page_id: string; block_uuid: string }) => {
+        await this.blockHandler.handleBlockDelete(client, data);
       });
 
       // Handle page events
-      client.on('page_update', (data: { page_id: string; page: any }) => {
-        this.pageHandler.handlePageUpdate(client, data);
+      client.on('page_update', async (data: { page_id: string; page: any }) => {
+        await this.pageHandler.handlePageUpdate(client, data);
       });
 
       // Handle disconnection
@@ -72,6 +81,24 @@ export class WebSocketService {
         this.presenceHandler.handleDisconnect(client);
       });
     });
+  }
+
+  private async canAccessPage(client: Socket, pageUuid: string): Promise<boolean> {
+    const userUuid = client.data.user?.userId;
+    if (!userUuid || !pageUuid) {
+      return false;
+    }
+
+    const [user, page] = await Promise.all([
+      this.userRepo.findByUuid(userUuid),
+      this.pageRepo.findByUuid(pageUuid),
+    ]);
+
+    if (!user || !page || page.deletedAt) {
+      return false;
+    }
+
+    return this.permissionService.canAccessWorkspace(user.id, page.workspaceId);
   }
 
   /**

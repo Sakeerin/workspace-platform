@@ -2,6 +2,11 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import api from '../services/api';
 
+function clearStoredTokens() {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+}
+
 interface User {
   uuid: string;
   email: string;
@@ -77,8 +82,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
+        clearStoredTokens();
         set({
           user: null,
           accessToken: null,
@@ -99,8 +103,11 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
           });
         } catch (error) {
+          clearStoredTokens();
           set({
             user: null,
+            accessToken: null,
+            refreshToken: null,
             isAuthenticated: false,
           });
         }
